@@ -1,12 +1,17 @@
 package com.yasu.ftpLogic.ftpStuff;
 
+import com.yasu.ftpLogic.entity.FileDetail;
 import com.yasu.ftpLogic.errorHandling.ErrorMessage;
 import org.aspectj.bridge.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Client {
     private  final  String serverAddress;
@@ -30,9 +35,18 @@ public class Client {
         }
         return length;
     }
+    private void basla(){
+        try{
+            Socket socket = new Socket(serverAddress, serverPort);
+            socket.close();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
 
     public ErrorMessage sendFile(String filePath, String username){
-
         try  (Socket socket = new Socket(serverAddress, serverPort)) {
             try {
 
@@ -44,6 +58,7 @@ public class Client {
             PrintWriter writer = new PrintWriter(os, true);
 
             File file = new File(filePath);
+
             long a=2147483648L;
             File file2 = new File("C:\\user\\"+username);
             if(folderSize(file2)>= a)
@@ -63,7 +78,7 @@ public class Client {
                     System.out.println("Kalan depolama alanı : " + capcity  );
                     System.out.println("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName());
                     listFiles("C:\\user\\"+username);
-                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName(),"");
+                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName(),"200");
 
 
 
@@ -86,6 +101,65 @@ public class Client {
 
     }
 
+    public FileDetail downloadFile(String filePath, String username) {
+        try (Socket socket = new Socket(serverAddress, serverPort)) {
+            OutputStream os = socket.getOutputStream();
+            PrintWriter writer = new PrintWriter(os, true);
+            InputStream is = socket.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+            // Sunucuya dosya yolunu gönder
+            writer.println(filePath);
+
+            // Sunucudan gelen yanıtı oku
+            String response = reader.readLine();
+
+            // Dosya bulunamazsa veya depolama alanı yetersizse işlemi sonlandır
+            if (response.equals("notFoundFile") || response.equals("InsufficientStorageSpace")) {
+                System.out.println("İndirme başarısız: " + response);
+                return null;
+            }
+
+            // Dosya bilgilerini oku
+            long fileSize = Long.parseLong(reader.readLine());
+            String fileName = reader.readLine();
+            String targetDirectory = reader.readLine();
+
+            // Dosya indirme yolu
+            String downloadPath = "C:\\user\\" + username + "\\" + fileName;
+
+            // Dosyayı sunucudan indir
+            try (FileOutputStream fos = new FileOutputStream(downloadPath)) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                long totalBytesRead = 0;
+
+                System.out.println("Dosya indiriliyor: " + fileName);
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, bytesRead);
+                    totalBytesRead += bytesRead;
+                }
+
+                System.out.println("Dosya indirme tamamlandı: " + fileName);
+                fos.close();
+
+                // İndirilen dosyanın detaylarını oluştur
+                File downloadedFile = new File(downloadPath);
+                FileDetail fileDetail = FileDetail.builder()
+                        .filename(downloadedFile.getName())
+                        .filepath(downloadPath)
+                        .filesize(downloadedFile.length())
+                        .build();
+
+                return fileDetail;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     private void sendFileNameAndSize(PrintWriter writer, String filepath, long fileSize, String fileName,String targetDirectory) {
         writer.println(filepath);
         writer.println(fileSize);
@@ -111,24 +185,36 @@ public class Client {
         }
     }
 
-    public void listFiles(String directoryPath) {
+    public List<FileDetail> listFiles(String directoryPath) {
         File directory = new File(directoryPath);
+
         if (directory.exists() && directory.isDirectory()) {
             File[] files = directory.listFiles();
+            List<FileDetail>  a = new ArrayList<FileDetail>();
 
             if (files != null) {
                 System.out.println("Klasördeki Dosyalar:");
                 for (File file : files) {
-                    if (file.isFile()) {
-                        System.out.println(file.getName());
+                  if (file.isFile()) {
+                      System.out.println(file.getName());
+                      FileDetail fileDetail=FileDetail.builder()
+                              .filesize(file.length())
+                              .filepath(file.getPath())
+                              .filename(file.getName())
+                              .build();
+                     a.add(fileDetail);
+
                     }
+
                 }
+                return a;
             } else {
                 System.out.println("Klasör boş.");
             }
         } else {
             System.out.println("Belirtilen klasör bulunamadı veya bir klasör değil.");
         }
+        return null;
     }
 
 

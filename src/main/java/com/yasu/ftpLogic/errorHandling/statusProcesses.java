@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class statusProcesses  {
-    private List<String> processes;
+    private  String processes;
 }

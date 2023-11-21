@@ -9,4 +9,5 @@ import java.util.List;
 
 public class UploadRequest {
     private List<String> filepath;
+
 }
