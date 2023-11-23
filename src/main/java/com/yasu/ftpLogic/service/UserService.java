@@ -8,7 +8,8 @@ import java.util.List;
 public interface UserService {
     UserDto signUp(UserEntity userEntity);
     String signIn(UserEntity entity);
-
+    UserEntity getUser(String username);
     String delete(Long id);
     List<UserDto> userList();
+   double updateCapacity(String username,Long size);
 }

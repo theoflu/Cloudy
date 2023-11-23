@@ -1,14 +1,20 @@
 <script>
+import UploadService from "@/assets/services/UploadFilesService";
+
 export default {
   name:"DropFile",
   data() {
     return {
       isDragging: false,
       files: [],
+      selectedFiles: undefined,
+      progressInfos: [],
     };
   },
   methods: {
     onChange() {
+      this.selectedFiles = event.target.files;
+      this.progressInfos = [];
       const self = this;
       let incomingFiles = Array.from(this.$refs.file.files);
       const fileExist = self.files.some((r) =>
@@ -23,7 +29,40 @@ export default {
         self.files.push(...incomingFiles);
       }
     },
+    uploadFiles() {
+      this.message = "";
 
+      for (let i = 0; i < this.selectedFiles.length; i++) {
+        this.upload(i, this.selectedFiles[i]);
+        console.log(this.selectedFiles[i]);
+      }
+    },
+    upload(idx, file) {
+      this.progressInfos[idx] = { percentage: 0, fileName: file.name };
+
+      UploadService.upload(file, (event) => {
+        this.progressInfos[idx].percentage = Math.round(100 * event.loaded / event.total);
+
+      })
+          .then((response) => {
+
+
+            this.message =  response.data.processes;
+            alert(this.message)
+
+            location.reload();
+
+          })
+          .then((files) => {
+
+            this.fileInfos = files.data;
+          })
+          .catch(() => {
+            this.progressInfos[idx].percentage = 0;
+            this.message = "Could not upload the file:" + file.name;
+
+          });
+    },
     dragover(e) {
       e.preventDefault();
       this.isDragging = true;
@@ -39,6 +78,7 @@ export default {
     },
     remove(i) {
       this.files.splice(i, 1);
+      this.selectedFiles = event.target.files;
     },
     generateURL(file) {
       let fileSrc = URL.createObjectURL(file);
@@ -69,8 +109,8 @@ export default {
         class="hidden-input"
         @change="onChange"
         ref="file"
-        accept=".pdf,.jpg,.jpeg,.png"
     />
+
 
     <label for="fileInput" class="file-label">
       <div v-if="isDragging">Release to drop files here.</div>
@@ -95,6 +135,32 @@ export default {
           >
             <b>×</b>
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-success"
+          :disabled="!selectedFiles"
+          @click="uploadFiles"
+  >
+    Upload
+  </button>
+  <div v-if="progressInfos">
+    <div class="mb-2"
+         v-for="(progressInfo, index) in progressInfos"
+         :key="index"
+    >
+      <span>{{progressInfo.fileName}}</span>
+      <div class="progress">
+        <div class="progress-bar progress-bar-info"
+             role="progressbar"
+             :aria-valuenow="progressInfo.percentage"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             :style="{ width: progressInfo.percentage + '%' }"
+        >
+          {{progressInfo.percentage}}%
         </div>
       </div>
     </div>

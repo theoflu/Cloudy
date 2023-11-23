@@ -37,6 +37,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserEntity getUser(String username) {
+        return  userRepository.findUserEntityByUsername(username);
+    }
+
+    @Override
     public String delete(Long id) {
         userRepository.deleteById(id);
         return "Silindi";
@@ -46,5 +51,13 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> userList() {
         List<UserEntity> users=userRepository.findAll();
         return users.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public double updateCapacity(String username,Long size) {
+        UserEntity user= userRepository.findUserEntityByUsername(username);
+        user.setUsageSize(size/1000000000d);
+        userRepository.save(user);
+        return user.getUsageSize();
     }
 }

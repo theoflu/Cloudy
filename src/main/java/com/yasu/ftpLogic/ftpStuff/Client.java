@@ -78,14 +78,14 @@ public class Client {
                     System.out.println("Kalan depolama alanı : " + capcity  );
                     System.out.println("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName());
                     listFiles("C:\\user\\"+username);
-                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName(),"200");
+                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName(),"200",folderSize(file2));
 
 
 
                 } else {
                     System.out.println("Belirtilen dosya bulunamadı veya bir dosya değil.");
                     notFound(writer,"notFoundFile");
-                    return new ErrorMessage("Dosya gönderilmedi.Belirtilen dosya bulunamadı veya bir dosya değil. "+ "C:\\user\\"+username+"\\"+file.getName(),"");
+                    return new ErrorMessage("Dosya gönderilmedi.Belirtilen dosya bulunamadı veya bir dosya değil. "+ "C:\\user\\"+username+"\\"+file.getName(),"",folderSize(file2));
 
                 }
             }
@@ -97,7 +97,7 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ErrorMessage("Dosya gönderilemedi ","InsufficientStorageSpace");
+        return new ErrorMessage("Dosya gönderilemedi ","InsufficientStorageSpace",0L);
 
     }
 

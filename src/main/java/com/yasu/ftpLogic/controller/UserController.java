@@ -14,14 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", maxAge = 3600,allowedHeaders = "*")
 @RestController
 
 @RequestMapping("/user")
@@ -37,14 +34,23 @@ public class UserController {
             // client giricek tüm işlemlerini bitirdikten sonra çıkıcak şekilde düzeltelim
             Client client = new Client("localhost", 3456);
             File tempFile = File.createTempFile("uploadedFile", file.getOriginalFilename());
-            try (OutputStream os = new FileOutputStream(tempFile)) {
-                os.write(file.getBytes());
+            try (InputStream inputStream = file.getInputStream();
+                 OutputStream outputStream = new FileOutputStream(tempFile)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
             }
             String username = jwtUtils.getUserNameFromJwtToken(token.substring(6));
 
+
            ErrorMessage isGiddimi= client.sendFile(tempFile.getAbsolutePath(), username);
+
            if(isGiddimi.getCode().equals("200")){
+               userService.updateCapacity(username,isGiddimi.getUsageSize());
                return new statusProcesses("GÖNDERİLDİ");
+
            }
            else
                return new statusProcesses("Gönderilemedi");
@@ -57,11 +63,16 @@ public class UserController {
 
     }
     @GetMapping("/fileslist")
-    public List<FileDetail> filesList(){
+    public List<FileDetail> filesList(@RequestHeader("Authorization")String token){
         Client client  = new Client("localhost", 3456);
-       // String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
-        client.listFiles("C:\\user\\"+"as3d");
-        return client.listFiles("C:\\user\\"+"as3d");
+        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
+        client.listFiles("C:\\user\\"+username);
+        return client.listFiles("C:\\user\\"+username);
+    }
+    @GetMapping("/getuser")
+    public UserEntity getUser(@RequestHeader("Authorization")String token){
+        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
+        return  userService.getUser(username);
     }
     public ResponseEntity<?> download(String username){
         Client client  = new Client("localhost", 3456);
@@ -69,6 +80,7 @@ public class UserController {
         client.downloadFile("C:\\user\\",username);
         return ResponseEntity.ok(client.listFiles("C:\\user\\"+"as3d"));
     }
+
 
     @PostMapping("/signUp")
     public ResponseEntity<?> signUp(@RequestBody UserEntity userEntity){

@@ -10,7 +10,7 @@ class UploadFilesService {
         return http.post("/user/upload", formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhczNkIiwiaWF0IjoxNzAwNDY3NDY2LCJleHAiOjE3MDA1NTM4NjZ9.aqG1lnW1wrlXvaTdeEft_vBw7yxt4-1vL3j0ySjJsX4"
+                "Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhczNkIiwiaWF0IjoxNzAwNzMwMjQ2LCJleHAiOjE3MDA4MTY2NDZ9.8CHht6XIUMNoq-2vnNUs2FHc1xuRXCEqENM22ua-S5o"
             },
             onUploadProgress
         });

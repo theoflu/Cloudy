@@ -1,12 +1,13 @@
 <template>
+
+
   <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>CloudBOX | Responsive Bootstrap 4 Admin Dashboard Template</title>
-
   </head>
-  <!-- Favicon -->
+    <!-- Favicon -->
 
   <body class="  ">
   <!-- loader Start
@@ -347,7 +348,7 @@
         </nav>
         <div class="sidebar-bottom">
           <h4 class="mb-3"><i class="las la-cloud mr-2"></i>Storage</h4>
-          <p >{{user.usageSize}} / 20 GB Used</p>
+          <p>17.1 / 20 GB Used</p>
           <div class="iq-progress-bar mb-3">
                       <span class="bg-primary iq-progress progress-1" data-percent="67">
                       </span>
@@ -562,12 +563,14 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-8 ">
+          <div class="col-lg-8">
             <div class="card card-block card-stretch card-height iq-welcome" >
               <div class="card-body property2-content">
                 <div class="d-flex flex-wrap align-items-center">
-                  <div class="col-lg-8 col-sm-8 p-0">
-                   <DropFile/>
+                  <div class="col-lg-6 col-sm-6 p-0">
+                    <h3 class="mb-3">Welcome Penny</h3>
+                    <p class="mb-5">You have 32 new notifications and 23 unread messages to reply</p>
+                    <a href="#">Try Now<i class="las la-arrow-right ml-2"></i></a>
                   </div>
                 </div>
               </div>
@@ -581,7 +584,25 @@
                 </div>
               </div>
               <div class="card-body">
-               <DropFile/>
+                <ul class="list-inline p-0 mb-0 row align-items-center">
+                  <li class="col-lg-6 col-sm-6 mb-3 mb-sm-0">
+                    <div data-load-file="file" data-load-target="#resolte-contaniner" data-url="../../../assets/vendor/doc-viewer/files/demo.pdf" data-toggle="modal" data-target="#exampleModal" data-title="Product-planning.pdf" style="cursor: pointer;" class="p-2 text-center border rounded">
+                      <div>
+                        <img src="../../../assets/images/layouts/mydrive/folder-1.png" class="img-fluid mb-1" alt="image1">
+                      </div>
+                      <p class="mb-0">Planning</p>
+                    </div>
+                  </li>
+                  <li class="col-lg-6 col-sm-6">
+                    <div data-load-file="file" data-load-target="#resolte-contaniner" data-url="../../../assets/vendor/doc-viewer/files/demo.docx" data-toggle="modal" data-target="#exampleModal" data-title="Wireframe.docx" style="cursor: pointer;" class="p-2 text-center border rounded">
+                      <div>
+                        <img src="../../../assets/images/layouts/mydrive/folder-2.png" class="img-fluid mb-1" alt="image2">
+                      </div>
+                      <p class="mb-0">Wireframe</p>
+                    </div>
+
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
@@ -597,20 +618,58 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-3 col-md-6 col-sm-6" v-for='(item, index) in files' :key='index'>
+          <div class="col-lg-3 col-md-6 col-sm-6">
             <div class="card card-block card-stretch card-height">
               <div class="card-body image-thumb">
-                <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
+                <a href="#" data-title="Terms.pdf" data-load-file="file" data-load-target="#resolte-contaniner" data-url="../../../assets/vendor/doc-viewer/files/demo.pdf" data-toggle="modal" data-target="#exampleModal">
                   <div class="mb-4 text-center p-3 rounded iq-thumb">
                     <div class="iq-image-overlay"></div>
                     <img src="../../../assets/images/layouts/page-1/pdf.png" class="img-fluid" alt="image1">
                   </div>
-                  <h6>{{item.filename}}</h6>
+                  <h6>Terms.pdf</h6>
                 </a>
               </div>
             </div>
           </div>
-
+          <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="card card-block card-stretch card-height">
+              <div class="card-body image-thumb">
+                <a href="#" data-title="New-one.docx" data-load-file="file" data-load-target="#resolte-contaniner" data-url="../../../assets/vendor/doc-viewer/files/demo.docx" data-toggle="modal" data-target="#exampleModal">
+                  <div class="mb-4 text-center p-3 rounded iq-thumb">
+                    <div class="iq-image-overlay"></div>
+                    <img src="../../../assets/images/layouts/page-1/doc.png" class="img-fluid" alt="image1">
+                  </div>
+                  <h6>New-one.docx</h6>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="card card-block card-stretch card-height">
+              <div class="card-body image-thumb">
+                <a href="#" data-title="Woo-box.xlsx" data-load-file="file" data-load-target="#resolte-contaniner"  data-url="../../../assets/vendor/doc-viewer/files/demo.xlsx" data-toggle="modal" data-target="#exampleModal">
+                  <div class="mb-4 text-center p-3 rounded iq-thumb">
+                    <div class="iq-image-overlay"></div>
+                    <img src="../../../assets/images/layouts/page-1/xlsx.png" class="img-fluid" alt="image1">
+                  </div>
+                  <h6>Woo-box.xlsx</h6>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="card card-block card-stretch card-height">
+              <div class="card-body image-thumb doc-text">
+                <a href="#" data-title="IOS-content.pptx" data-load-file="file" data-load-target="#resolte-contaniner" data-url="../../../assets/vendor/doc-viewer/files/demo.pptx" data-toggle="modal" data-target="#exampleModal">
+                  <div class="mb-4 text-center p-3 rounded iq-thumb">
+                    <div class="iq-image-overlay"></div>
+                    <img src="../../../assets/images/layouts/page-1/ppt.png" class="img-fluid" alt="image1">
+                  </div>
+                  <h6>IOS-content.pptx</h6>
+                </a>
+              </div>
+            </div>
+          </div>
           <div class="col-lg-12">
             <div class="card card-block card-stretch card-transparent">
               <div class="card-header d-flex justify-content-between pb-0">
@@ -666,7 +725,102 @@
               </div>
             </div>
           </div>
-
+          <div class="col-md-6 col-sm-6 col-lg-3">
+            <div class="card card-block card-stretch card-height">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <a href="./page-android.html" class="folder">
+                    <div class="icon-small bg-primary rounded mb-4">
+                      <i class="ri-file-copy-line"></i>
+                    </div>
+                  </a>
+                  <div class="card-header-toolbar">
+                    <div class="dropdown">
+                                        <span class="dropdown-toggle" id="dropdownMenuButton3" data-toggle="dropdown">
+                                            <i class="ri-more-2-fill"></i>
+                                        </span>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton3">
+                        <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>
+                        <a class="dropdown-item" href="#"><i class="ri-delete-bin-6-fill mr-2"></i>Delete</a>
+                        <a class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                        <a class="dropdown-item" href="#"><i class="ri-printer-fill mr-2"></i>Print</a>
+                        <a class="dropdown-item" href="#"><i class="ri-file-download-fill mr-2"></i>Download</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <a href="./page-android.html" class="folder">
+                  <h5 class="mb-2">Android</h5>
+                  <p class="mb-2"><i class="lar la-clock text-primary mr-2 font-size-20"></i> 09 Dec, 2020</p>
+                  <p class="mb-0"><i class="las la-file-alt text-primary mr-2 font-size-20"></i> 08 Files</p>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-sm-6 col-lg-3">
+            <div class="card card-block card-stretch card-height">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <a href="./page-brightspot.html" class="folder">
+                    <div class="icon-small bg-info rounded mb-4">
+                      <i class="ri-file-copy-line"></i>
+                    </div>
+                  </a>
+                  <div class="card-header-toolbar">
+                    <div class="dropdown">
+                                        <span class="dropdown-toggle" id="dropdownMenuButton4" data-toggle="dropdown">
+                                            <i class="ri-more-2-fill"></i>
+                                        </span>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton4">
+                        <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>
+                        <a class="dropdown-item" href="#"><i class="ri-delete-bin-6-fill mr-2"></i>Delete</a>
+                        <a class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                        <a class="dropdown-item" href="#"><i class="ri-printer-fill mr-2"></i>Print</a>
+                        <a class="dropdown-item" href="#"><i class="ri-file-download-fill mr-2"></i>Download</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <a href="./page-brightspot.html" class="folder">
+                  <h5 class="mb-2">Brightspot</h5>
+                  <p class="mb-2"><i class="lar la-clock text-info mr-2 font-size-20"></i> 07 Dec, 2020</p>
+                  <p class="mb-0"><i class="las la-file-alt text-info mr-2 font-size-20"></i> 08 Files</p>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-sm-6 col-lg-3">
+            <div class="card card-block card-stretch card-height">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <a href="./page-ionic.html" class="folder">
+                    <div class="icon-small bg-success rounded mb-4">
+                      <i class="ri-file-copy-line"></i>
+                    </div>
+                  </a>
+                  <div class="card-header-toolbar">
+                    <div class="dropdown">
+                                        <span class="dropdown-toggle" id="dropdownMenuButton5" data-toggle="dropdown">
+                                            <i class="ri-more-2-fill"></i>
+                                        </span>
+                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton5">
+                        <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>
+                        <a class="dropdown-item" href="#"><i class="ri-delete-bin-6-fill mr-2"></i>Delete</a>
+                        <a class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                        <a class="dropdown-item" href="#"><i class="ri-printer-fill mr-2"></i>Print</a>
+                        <a class="dropdown-item" href="#"><i class="ri-file-download-fill mr-2"></i>Download</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <a href="./page-ionic.html" class="folder">
+                  <h5 class="mb-2">Ionic Chat App</h5>
+                  <p class="mb-2"><i class="lar la-clock text-success mr-2 font-size-20"></i> 06 Dec, 2020</p>
+                  <p class="mb-0"><i class="las la-file-alt text-success mr-2 font-size-20"></i> 08 Files</p>
+                </a>
+              </div>
+            </div>
+          </div>
           <div class="col-lg-8 col-xl-8">
             <div class="card card-block card-stretch card-height files-table">
               <div class="card-header d-flex justify-content-between">
@@ -831,7 +985,84 @@
               </div>
             </div>
           </div>
-
+          <div class="col-lg-4">
+            <div class="card card-block card-stretch card-height ">
+              <div class="card-header d-flex justify-content-between">
+                <div class="header-title">
+                  <h4 class="card-title">Statistic</h4>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="layout-1-chart" style="min-height: 220px;"></div>
+                <div class="row mt-4">
+                  <div class="col-lg-6 col-md-6 col-6">
+                    <div class="media align-items-center">
+                      <div class="icon iq-icon-box bg-primary rounded icon-statistic">
+                        <i class="las la-long-arrow-alt-down"></i>
+                      </div>
+                      <div class="media-body ml-3">
+                        <p class="mb-0">Downloads</p>
+                        <h5>12,594</h5>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-6">
+                    <div class="media align-items-center">
+                      <div class="icon iq-icon-box bg-light rounded icon-statistic">
+                        <i class="las la-long-arrow-alt-up"></i>
+                      </div>
+                      <div class="media-body ml-3">
+                        <p class="mb-0">Uploads</p>
+                        <h5>1,458</h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card card-block card-stretch card-height  plan-bg">
+              <div class="card-body">
+                <h4 class="mb-3 text-white">Unlock Your plan</h4>
+                <p>Expanded Storage, Access To<br> More Features On CloudBOX</p>
+                <div class="row align-items-center justify-content-between">
+                  <div class="col-6 go-white ">
+                    <a href="#" class="btn d-inline-block mt-5">Go Premium</a>
+                  </div>
+                  <div class="col-6">
+                    <img src="../../../assets/images/layouts/mydrive/lock-bg.png" class="img-fluid" alt="image1">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="card card-block card-stretch card-height">
+              <div class="card-header d-flex justify-content-between pb-0">
+                <div class="header-title">
+                  <h4 class="card-title">Storage</h4>
+                </div>
+                <div class="card-header-toolbar d-flex align-items-center">
+                  <div class="dropdown">
+                                    <span class="dropdown-toggle btn  dropdown-bg border border-primary text-primary rounded" id="dropdownMenuButton11"
+                                          data-toggle="dropdown">
+                                        Monthly<i class="ri-arrow-down-s-line ml-1"></i>
+                                    </span>
+                    <div class="dropdown-menu dropdown-menu-right shadow-none"
+                         aria-labelledby="dropdownMenuButton11">
+                      <a class="dropdown-item" href="#">Monthly</a>
+                      <a class="dropdown-item" href="#">Weekly</a>
+                      <a class="dropdown-item" href="#">Yearly</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body pt-0">
+                <div id="layout-1-chart2"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -878,41 +1109,11 @@
 </template>
 
 <script>
-import {getAll} from "@/common/user-service";
-import {getUser} from "@/common/user-service";
-import DropFile from "@/components/DropFile.vue";
-
 export default {
   name: 'HelloWorld',
-  components: {DropFile},
   props: {
     msg: String
-  },
-  data(){
-    return {
-      files:[],
-      user:[]
-
-    }
-  },
-  created() {
-    this.getfilelists();
-    this.getuser();
-
-  },methods:{
-    getfilelists(){
-      getAll().then(response=>{
-        this.files=response.data;
-      })
-    },
-    getuser(){
-      getUser().then(response=>{
-        this.user=response.data;
-        console.log(this.user);
-      })
-    }
   }
-
 }
 </script>
 
