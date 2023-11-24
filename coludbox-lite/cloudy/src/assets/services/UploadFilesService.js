@@ -1,7 +1,7 @@
 import http from "../js/http-common";
 
 class UploadFilesService {
-    upload(file, onUploadProgress) {
+    upload(file, onUploadProgress,jwt) {
         let formData = new FormData();
 
 
@@ -10,7 +10,7 @@ class UploadFilesService {
         return http.post("/user/upload", formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhczNkIiwiaWF0IjoxNzAwNzMwMjQ2LCJleHAiOjE3MDA4MTY2NDZ9.8CHht6XIUMNoq-2vnNUs2FHc1xuRXCEqENM22ua-S5o"
+                "Authorization": "Bearer " +jwt
             },
             onUploadProgress
         });

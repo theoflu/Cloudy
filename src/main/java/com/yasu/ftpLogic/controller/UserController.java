@@ -33,7 +33,7 @@ public class UserController {
         try {
             // client giricek tüm işlemlerini bitirdikten sonra çıkıcak şekilde düzeltelim
             Client client = new Client("localhost", 3456);
-            File tempFile = File.createTempFile("uploadedFile", file.getOriginalFilename());
+            File tempFile = File.createTempFile("uploaded", file.getOriginalFilename());
             try (InputStream inputStream = file.getInputStream();
                  OutputStream outputStream = new FileOutputStream(tempFile)) {
                 byte[] buffer = new byte[1024];
@@ -49,6 +49,9 @@ public class UserController {
 
            if(isGiddimi.getCode().equals("200")){
                userService.updateCapacity(username,isGiddimi.getUsageSize());
+               if (tempFile != null && tempFile.exists()) {
+                   tempFile.delete();
+               }
                return new statusProcesses("GÖNDERİLDİ");
 
            }

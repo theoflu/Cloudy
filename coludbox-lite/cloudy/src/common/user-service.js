@@ -2,11 +2,12 @@ import {get} from"@/common/api-service"
 export function getById(id) {
     return get('user/' + id);
 }
-export function getAll(){
-    return get('user/fileslist');
+
+export function getAll(headers){
+    return get('user/fileslist',headers );
 }
-export function getUser(){
-    return get('user/getuser');
+export function getUser(headers){
+    return get('user/getuser',headers);
 }
 export function getSellerAllProducts(seller){
     return get('products/company/'+ seller)

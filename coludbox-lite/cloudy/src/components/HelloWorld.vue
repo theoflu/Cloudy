@@ -42,58 +42,22 @@
         <nav class="iq-sidebar-menu">
           <ul id="iq-sidebar-toggle" class="iq-menu">
             <li class="active">
-              <a href="../../../backend/index.html" class="">
+              <a href="/menu" class="">
                 <i class="las la-home iq-arrow-left"></i><span>Dashboard</span>
               </a>
               <ul id="dashboard" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
               </ul>
             </li>
-            <li class=" ">
-              <a href="#mydrive" class="collapsed" data-toggle="collapse" aria-expanded="false">
-                <i class="las la-hdd"></i><span>My Drive</span>
-                <i class="las la-angle-right iq-arrow-right arrow-active"></i>
-                <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
-              </a>
-              <ul id="mydrive" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
-                <li class=" ">
 
-                </li>
-                <li class=" ">
-
-                </li>
-                <li class=" ">
-
-                </li>
-                <li class=" ">
-                  <a href="../../../backend/page-ionic.html">
-                    <i class="las la-icons"></i><span>Ionic Chat App</span>
-                  </a>
-                </li>
-              </ul>
-            </li>
             <li class=" ">
-              <a href="../../../backend/page-files.html" class="">
-                <i class="lar la-file-alt iq-arrow-left"></i><span>Files</span>
-              </a>
-              <ul id="page-files" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
-              </ul>
-            </li>
-            <li class=" ">
-              <a href="../../../backend/page-folders.html" class="">
-                <i class="las la-stopwatch iq-arrow-left"></i><span>Recent</span>
-              </a>
-              <ul id="page-folders" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
-              </ul>
-            </li>
-            <li class=" ">
-              <a href="../../../backend/page-favourite.html" class="">
+              <a href="/favourite" class="">
                 <i class="lar la-star"></i><span>Favourite</span>
               </a>
-              <ul id="page-fevourite" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
+              <ul id="page-favourite" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
               </ul>
             </li>
             <li class=" ">
-              <a href="../../../backend/page-delete.html" class="">
+              <a href="/trash" class="">
                 <i class="las la-trash-alt iq-arrow-left"></i><span>Trash</span>
               </a>
               <ul id="page-delete" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
@@ -891,22 +855,32 @@ export default {
   data(){
     return {
       files:[],
-      user:[]
+      user:[],
+      jwt:""
+
 
     }
   },
   created() {
-    this.getfilelists();
-    this.getuser();
+    this.jwt=localStorage.getItem('accessToken');
+    const customHeaders = {
+      'Authorization':"Bearer " +this.jwt,
+
+    };
+
+    this.getfilelists(customHeaders);
+    this.getuser(customHeaders);
 
   },methods:{
-    getfilelists(){
-      getAll().then(response=>{
+
+    getfilelists(customHeaders){
+
+      getAll(customHeaders).then(response=>{
         this.files=response.data;
       })
     },
-    getuser(){
-      getUser().then(response=>{
+    getuser(customHeaders){
+      getUser(customHeaders).then(response=>{
         this.user=response.data;
         console.log(this.user);
       })

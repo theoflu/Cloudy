@@ -1,6 +1,7 @@
 <script>
 import UploadService from "@/assets/services/UploadFilesService";
 
+
 export default {
   name:"DropFile",
   data() {
@@ -34,16 +35,17 @@ export default {
 
       for (let i = 0; i < this.selectedFiles.length; i++) {
         this.upload(i, this.selectedFiles[i]);
-        console.log(this.selectedFiles[i]);
+
       }
     },
     upload(idx, file) {
       this.progressInfos[idx] = { percentage: 0, fileName: file.name };
-
+      this.jwt=localStorage.getItem('accessToken');
+      console.log(this.jwt)
       UploadService.upload(file, (event) => {
         this.progressInfos[idx].percentage = Math.round(100 * event.loaded / event.total);
 
-      })
+      },this.jwt)
           .then((response) => {
 
 

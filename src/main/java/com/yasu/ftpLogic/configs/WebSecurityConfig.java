@@ -73,8 +73,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                             requestMatchers("/api/auth/signUp").permitAll()
                                 .requestMatchers("/api/auth/signin").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
-                                .requestMatchers("/user/fileslist").permitAll()
-                                .requestMatchers("/user/getuser").permitAll()
+                                .requestMatchers("/user/upload").permitAll()
                                 .requestMatchers(HttpMethod.POST).permitAll()
                                 .anyRequest().authenticated()
                 );
