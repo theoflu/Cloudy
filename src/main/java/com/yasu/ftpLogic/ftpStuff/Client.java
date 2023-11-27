@@ -45,8 +45,44 @@ public class Client {
         }
 
     }
+    public ErrorMessage downloadFile(String filePath, String username,String downloadToHere){
+        try  (Socket socket = new Socket(serverAddress, serverPort)) {
+            try {
 
-    public ErrorMessage sendFile(String filePath, String username){
+                Thread.sleep(2000); // Millisaniye cinsinden süreyi belirtir (5 saniye = 5000 milisaniye)
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            OutputStream os = socket.getOutputStream();
+            PrintWriter writer = new PrintWriter(os, true);
+
+            File file = new File(filePath);
+                if (file.exists() && file.isFile()) {
+                    long fileSize = file.length();
+                    sendFileNameAndSize(writer, filePath, fileSize,file.getName(),downloadToHere);
+                    sendFileData(os, file);
+                    System.out.println("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName());
+                    listFiles("C:\\user\\"+username);
+                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName(),"200",1L);
+
+
+
+                } else {
+                    System.out.println("Belirtilen dosya bulunamadı veya bir dosya değil.");
+                    notFound(writer,"notFoundFile");
+                    return new ErrorMessage("Dosya gönderilmedi.Belirtilen dosya bulunamadı veya bir dosya değil. "+ "C:\\user\\"+username+"\\"+file.getName(),"",0L);
+
+                }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ErrorMessage("Dosya gönderilemedi ","InsufficientStorageSpace",0L);
+
+    }
+
+    public ErrorMessage sendFile(String filePath, String username,String orginalName){
         try  (Socket socket = new Socket(serverAddress, serverPort)) {
             try {
 
@@ -59,7 +95,7 @@ public class Client {
 
             File file = new File(filePath);
 
-            long a=2147483648L;
+            long a=21474836480L;
             File file2 = new File("C:\\user\\"+username);
             if(folderSize(file2)>= a)
             {
@@ -72,13 +108,13 @@ public class Client {
             else{
                 if (file.exists() && file.isFile()) {
                     long fileSize = file.length();
-                    sendFileNameAndSize(writer, filePath, fileSize,file.getName(),"C:\\user\\"+username+"\\");
+                    sendFileNameAndSize(writer, filePath, fileSize,orginalName,"C:\\user\\"+username+"\\");
                     sendFileData(os, file);
                     long capcity=(a-folderSize(file2));
                     System.out.println("Kalan depolama alanı : " + capcity  );
                     System.out.println("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName());
                     listFiles("C:\\user\\"+username);
-                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName(),"200",folderSize(file2));
+                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+orginalName,"200",folderSize(file2));
 
 
 
@@ -101,65 +137,7 @@ public class Client {
 
     }
 
-    public FileDetail downloadFile(String filePath, String username) {
-        try (Socket socket = new Socket(serverAddress, serverPort)) {
-            OutputStream os = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(os, true);
-            InputStream is = socket.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
-            // Sunucuya dosya yolunu gönder
-            writer.println(filePath);
-
-            // Sunucudan gelen yanıtı oku
-            String response = reader.readLine();
-
-            // Dosya bulunamazsa veya depolama alanı yetersizse işlemi sonlandır
-            if (response.equals("notFoundFile") || response.equals("InsufficientStorageSpace")) {
-                System.out.println("İndirme başarısız: " + response);
-                return null;
-            }
-
-            // Dosya bilgilerini oku
-            long fileSize = Long.parseLong(reader.readLine());
-            String fileName = reader.readLine();
-            String targetDirectory = reader.readLine();
-
-            // Dosya indirme yolu
-            String downloadPath = "C:\\user\\" + username + "\\" + fileName;
-
-            // Dosyayı sunucudan indir
-            try (FileOutputStream fos = new FileOutputStream(downloadPath)) {
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                long totalBytesRead = 0;
-
-                System.out.println("Dosya indiriliyor: " + fileName);
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    fos.write(buffer, 0, bytesRead);
-                    totalBytesRead += bytesRead;
-                }
-
-                System.out.println("Dosya indirme tamamlandı: " + fileName);
-                fos.close();
-
-                // İndirilen dosyanın detaylarını oluştur
-                File downloadedFile = new File(downloadPath);
-                FileDetail fileDetail = FileDetail.builder()
-                        .filename(downloadedFile.getName())
-                        .filepath(downloadPath)
-                        .filesize(downloadedFile.length())
-                        .build();
-
-                return fileDetail;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
     private void sendFileNameAndSize(PrintWriter writer, String filepath, long fileSize, String fileName,String targetDirectory) {
         writer.println(filepath);
         writer.println(fileSize);

@@ -10,11 +10,17 @@ import com.yasu.ftpLogic.errorHandling.statusProcesses;
 import com.yasu.ftpLogic.ftpStuff.Client;
 import com.yasu.ftpLogic.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +39,8 @@ public class UserController {
         try {
             // client giricek tüm işlemlerini bitirdikten sonra çıkıcak şekilde düzeltelim
             Client client = new Client("localhost", 3456);
+            File targetFile=new File("C:\\user\\as3d");
+
             File tempFile = File.createTempFile("uploaded", file.getOriginalFilename());
             try (InputStream inputStream = file.getInputStream();
                  OutputStream outputStream = new FileOutputStream(tempFile)) {
@@ -45,7 +53,7 @@ public class UserController {
             String username = jwtUtils.getUserNameFromJwtToken(token.substring(6));
 
 
-           ErrorMessage isGiddimi= client.sendFile(tempFile.getAbsolutePath(), username);
+           ErrorMessage isGiddimi= client.sendFile(tempFile.getAbsolutePath(), username,file.getOriginalFilename());
 
            if(isGiddimi.getCode().equals("200")){
                userService.updateCapacity(username,isGiddimi.getUsageSize());
@@ -77,11 +85,41 @@ public class UserController {
         String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
         return  userService.getUser(username);
     }
-    public ResponseEntity<?> download(String username){
+    @PostMapping("/downloads/{filename}")
+    public statusProcesses downloads(@RequestHeader("Authorization")String token,@PathVariable("filename") String filename){
         Client client  = new Client("localhost", 3456);
-        // String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
-        client.downloadFile("C:\\user\\",username);
-        return ResponseEntity.ok(client.listFiles("C:\\user\\"+"as3d"));
+         String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
+        ErrorMessage isGiddimi=client.downloadFile("C:\\user\\"+username+"\\"+filename,username,"C:\\user\\");
+        if(isGiddimi.getCode().equals("200")){
+            return new statusProcesses("İndirildi.");
+
+        }
+        else
+            return new statusProcesses("İndirilemedi");
+    }
+    @GetMapping("/download/{filename}")
+    public ResponseEntity<Resource> downloadFile(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("filename") String filename
+    ) throws IOException {
+
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(6));
+        String filePath = "C:\\user\\" + username + "\\" + filename;
+
+        Path path = Paths.get(filePath);
+        FileSystemResource resource = new FileSystemResource(path);
+
+        if (resource.exists() && resource.isReadable()) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(resource);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 

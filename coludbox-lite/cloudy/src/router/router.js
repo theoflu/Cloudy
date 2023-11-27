@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HelloWorld from "@/components/HelloWorld.vue";
 import Login from "@/components/UserLogin.vue";
 import UserRegister from "@/components/UserRegister.vue";
+import DownloadFiles from "@/components/DownloadFiles.vue";
 
 const routes = [
     {
@@ -17,6 +18,11 @@ const routes = [
         path: '/register',
         name: 'register',
         component: UserRegister
+    }
+    , {
+        path: '/downloadfile',
+        name: 'downloadfile',
+        component: DownloadFiles
     }
 
 ]

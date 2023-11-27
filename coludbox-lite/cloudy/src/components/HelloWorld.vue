@@ -316,7 +316,7 @@
                       <span class="bg-primary iq-progress progress-1" data-percent="67">
                       </span>
           </div>
-          <p>75% Full - 3.9 GB Free</p>
+          <p>%{{(user.usageSize)/5}} Full - {{20-user.usageSize}} GB Free</p>
           <a href="#" class="btn btn-outline-primary view-more mt-4">Buy Storage</a>
         </div>
         <div class="p-3"></div>
@@ -567,9 +567,9 @@
                 <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
                   <div class="mb-4 text-center p-3 rounded iq-thumb">
                     <div class="iq-image-overlay"></div>
-                    <img src="../../../assets/images/layouts/page-1/pdf.png" class="img-fluid" alt="image1">
+                    <img @click="getFiles(item.filename)"  src="../../../assets/images/layouts/page-1/pdf.png" class="img-fluid" alt="image1">
                   </div>
-                  <h6>{{item.filename}}</h6>
+                  <h6 ref="ad">{{item.filename}}</h6>
                 </a>
               </div>
             </div>
@@ -842,9 +842,14 @@
 </template>
 
 <script>
-import {getAll} from "@/common/user-service";
+
+
+import {getAll, getFiles} from "@/common/user-service";
 import {getUser} from "@/common/user-service";
 import DropFile from "@/components/DropFile.vue";
+import axios from "axios";
+
+
 
 export default {
   name: 'HelloWorld',
@@ -856,7 +861,8 @@ export default {
     return {
       files:[],
       user:[],
-      jwt:""
+      jwt:"",
+      durum:[],
 
 
     }
@@ -871,6 +877,7 @@ export default {
     this.getfilelists(customHeaders);
     this.getuser(customHeaders);
 
+
   },methods:{
 
     getfilelists(customHeaders){
@@ -884,8 +891,67 @@ export default {
         this.user=response.data;
         console.log(this.user);
       })
+    },
+    async downloadFile(filename) {
+      try {
+        this.jwt=localStorage.getItem('accessToken');
+        const customHeaders = {
+          'Authorization':"Bearer " +this.jwt,
+
+        };
+
+        const response = await getFiles(customHeaders, filename);
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+
+        // Dosyayı indirmek için bir <a> etiketi oluşturma ve tıklama işlemi
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        this.durum=response;
+        if(this.durum.data.processes=="İndirildi."){
+          alert("İndirildi.");
+        }
+
+
+      } catch (error) {
+        console.error('Dosya indirme hatası:', error);
+        // Hata durumunda kullanıcıya bir mesaj gösterebilirsiniz
+      }
+    },
+    async getFiles(filename) {
+      try {
+        const response = await axios.get(`user/download/${filename}`, {
+          headers: {
+            'Authorization':"Bearer " +this.jwt,
+
+          },
+          responseType: 'blob' // Dosyayı binary olarak almak için blob kullanılır
+        });
+        console.log(response);
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+
+        // Dosyayı indirmek için bir <a> etiketi oluşturma ve tıklama işlemi
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return response.data; // Dosya içeriğini istemciye döndür
+      } catch (error) {
+        throw new Error('Dosya alınamadı:', error);
+      }
     }
   }
+
+
+
+
 
 }
 </script>

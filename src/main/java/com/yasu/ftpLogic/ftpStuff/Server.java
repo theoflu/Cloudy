@@ -68,7 +68,7 @@ public class Server {
 
 
                     // Sıkıştırılmış dosyayı aç
-                    unzipFile(newFilePath, targetDirectory);
+                    unzipFile(newFilePath, targetDirectory,filename);
                     fos.close();
                     clientSocket.close();
                     System.out.println("Client çıktı");
@@ -80,23 +80,36 @@ public class Server {
         }
     }
 
-    private static void unzipFile(String zipFilePath, String targetDirectory) {
+    private static void unzipFile(String zipFilePath, String targetDirectory,String filename) {
         try (FileInputStream fis = new FileInputStream(zipFilePath);
              ZipInputStream zis = new ZipInputStream(fis)) {
 
             ZipEntry zipEntry;
+            int dotIndex = filename.lastIndexOf('.');
+
+            String extension = (dotIndex != -1) ? filename.substring(dotIndex + 1) : "HATA";
             while ((zipEntry = zis.getNextEntry()) != null) {
                 String entryName = zipEntry.getName();
-                String entryPath = targetDirectory + File.separator + entryName;
 
-                File entryFile = new File(entryPath);
-                entryFile.getParentFile().mkdirs();
+                //  uzantısana göre dosyalarını çıkart
+                if (entryName.endsWith("."+extension)) {
+                    // Dosya adını klasöre çevir ve varsa ilk '/' işaretine kadar olan kısmı kaldır
+                    String modifiedEntryName = entryName.replace("/", File.separator);
+                    if (modifiedEntryName.contains(File.separator)) {
+                        modifiedEntryName = modifiedEntryName.substring(modifiedEntryName.indexOf(File.separator) + 1);
+                    }
 
-                try (FileOutputStream fos = new FileOutputStream(entryFile)) {
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = zis.read(buffer)) != -1) {
-                        fos.write(buffer, 0, bytesRead);
+                    String entryPath = targetDirectory + File.separator + modifiedEntryName;
+
+                    File entryFile = new File(entryPath);
+                    entryFile.getParentFile().mkdirs();
+
+                    try (FileOutputStream fos = new FileOutputStream(entryFile)) {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = zis.read(buffer)) != -1) {
+                            fos.write(buffer, 0, bytesRead);
+                        }
                     }
                 }
             }
