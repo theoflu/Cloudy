@@ -63,250 +63,7 @@
               <ul id="page-delete" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
               </ul>
             </li>
-            <li class=" ">
-              <a href="#otherpage" class="collapsed" data-toggle="collapse" aria-expanded="false">
-                <i class="lab la-wpforms iq-arrow-left"></i><span>other page</span>
-                <i class="las la-angle-right iq-arrow-right arrow-active"></i>
-                <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
-              </a>
-              <ul id="otherpage" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
-                <li class=" ">
-                  <a href="#user" class="collapsed" data-toggle="collapse" aria-expanded="false">
-                    <i class="las la-user-cog"></i><span>User Details</span>
-                    <i class="las la-angle-right iq-arrow-right arrow-active"></i>
-                    <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
-                  </a>
-                  <ul id="user" class="iq-submenu collapse" data-parent="#otherpage">
-                    <li class=" ">
-                      <a href="../../../app/user-profile.html">
-                        <i class="las la-id-card"></i><span>User Profile</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../app/user-add.html">
-                        <i class="las la-user-plus"></i><span>User Add</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../app/user-list.html">
-                        <i class="las la-list-alt"></i><span>User List</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                <li class=" ">
-                  <a href="#ui" class="collapsed" data-toggle="collapse" aria-expanded="false">
-                    <i class="lab la-uikit iq-arrow-left"></i><span>UI Elements</span>
-                    <i class="las la-angle-right iq-arrow-right arrow-active"></i>
-                    <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
-                  </a>
-                  <ul id="ui" class="iq-submenu collapse" data-parent="#otherpage">
-                    <li class=" ">
-                      <a href="../../../backend/ui-avatars.html">
-                        <i class="las la-user-tie"></i><span>Avatars</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-alerts.html">
-                        <i class="las la-exclamation-triangle"></i><span>Alerts</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-badges.html">
-                        <i class="las la-id-badge"></i><span>Badges</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-breadcrumb.html">
-                        <i class="las la-ellipsis-h"></i><span>Breadcrumb</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-buttons.html">
-                        <i class="las la-ticket-alt"></i><span>Buttons</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-buttons-group.html">
-                        <i class="las la-object-group"></i><span>Buttons Group</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-boxshadow.html">
-                        <i class="las la-boxes"></i><span>Box Shadow</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-colors.html">
-                        <i class="las la-brush"></i><span>Colors</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-cards.html">
-                        <i class="las la-credit-card"></i><span>Cards</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-carousel.html">
-                        <i class="las la-sliders-h"></i><span>Carousel</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-grid.html">
-                        <i class="las la-th-large"></i><span>Grid</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-helper-classes.html">
-                        <i class="las la-hands-helping"></i><span>Helper classes</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-images.html">
-                        <i class="las la-image"></i><span>Images</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-list-group.html">
-                        <i class="las la-list-alt"></i><span>list Group</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-media-object.html">
-                        <i class="las la-photo-video"></i><span>Media</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-modal.html">
-                        <i class="las la-columns"></i><span>Modal</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-notifications.html">
-                        <i class="las la-bell"></i><span>Notifications</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-pagination.html">
-                        <i class="las la-ellipsis-h"></i><span>Pagination</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-popovers.html">
-                        <i class="las la-spinner"></i><span>Popovers</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-progressbars.html">
-                        <i class="las la-heading"></i><span>Progressbars</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-typography.html">
-                        <i class="las la-tablet"></i><span>Typography</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-tabs.html">
-                        <i class="las la-tablet"></i><span>Tabs</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-tooltips.html">
-                        <i class="las la-magnet"></i><span>Tooltips</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/ui-embed-video.html">
-                        <i class="las la-play-circle"></i><span>Video</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                <li class=" ">
-                  <a href="#auth" class="collapsed" data-toggle="collapse" aria-expanded="false">
-                    <i class="las la-torah iq-arrow-left"></i><span>Authentication</span>
-                    <i class="las la-angle-right iq-arrow-right arrow-active"></i>
-                    <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
-                  </a>
-                  <ul id="auth" class="iq-submenu collapse" data-parent="#otherpage">
-                    <li class=" ">
-                      <a href="../../../backend/auth-sign-in.html">
-                        <i class="las la-sign-in-alt"></i><span>Login</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/auth-sign-up.html">
-                        <i class="las la-registered"></i><span>Register</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/auth-recoverpw.html">
-                        <i class="las la-unlock-alt"></i><span>Recover Password</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/auth-confirm-mail.html">
-                        <i class="las la-envelope-square"></i><span>Confirm Mail</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/auth-lock-screen.html">
-                        <i class="las la-lock"></i><span>Lock Screen</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                <li class=" ">
-                  <a href="#pricing" class="collapsed" data-toggle="collapse" aria-expanded="false">
-                    <i class="las la-coins"></i><span>Pricing</span>
-                    <i class="las la-angle-right iq-arrow-right arrow-active"></i>
-                    <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
-                  </a>
-                  <ul id="pricing" class="iq-submenu collapse" data-parent="#otherpage">
-                    <li class=" ">
-                      <a href="../../../backend/pricing.html">
-                        <i class="las la-weight"></i><span>Pricing 1</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/pricing-2.html">
-                        <i class="las la-dna"></i><span>Pricing 2</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                <li class=" ">
-                  <a href="#pages-error" class="collapsed" data-toggle="collapse" aria-expanded="false">
-                    <i class="las la-exclamation-triangle"></i><span>Error</span>
-                    <i class="las la-angle-right iq-arrow-right arrow-active"></i>
-                    <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
-                  </a>
-                  <ul id="pages-error" class="iq-submenu collapse" data-parent="#otherpage">
-                    <li class=" ">
-                      <a href="../../../backend/pages-error.html">
-                        <i class="las la-bomb"></i><span>Error 404</span>
-                      </a>
-                    </li>
-                    <li class=" ">
-                      <a href="../../../backend/pages-error-500.html">
-                        <i class="las la-exclamation-circle"></i><span>Error 500</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                <li class=" ">
-                  <a href="../../../backend/pages-blank-page.html">
-                    <i class="las la-pager"></i><span>Blank Page</span>
-                  </a>
-                </li>
-                <li class=" ">
-                  <a href="../../../backend/pages-maintenance.html">
-                    <i class="las la-cubes"></i><span>Maintenance</span>
-                  </a>
-                </li>
-              </ul>
-            </li>
+
           </ul>
         </nav>
         <div class="sidebar-bottom">
@@ -562,11 +319,65 @@
             </div>
           </div>
           <div class="col-lg-3 col-md-6 col-sm-6" v-for='(item, index) in files' :key='index'>
+
             <div class="card card-block card-stretch card-height">
+
               <div class="card-body image-thumb">
+                <div style="align-self: auto" id="app">
+                  <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.isChecked" />
+                  <label :for="item.filename" >
+                    <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
+                      <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
+                        <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
+                        <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
+
+                        <g id="grp7" opacity="0" transform="translate(7 6)">
+                          <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
+                          <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
+                        </g>
+
+                        <g id="grp6" opacity="0" transform="translate(0 28)">
+                          <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
+                          <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
+                        </g>
+
+                        <g id="grp3" opacity="0" transform="translate(52 28)">
+                          <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
+                          <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
+                        </g>
+
+                        <g id="grp2" opacity="0" transform="translate(44 6)">
+                          <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
+                          <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
+                        </g>
+
+                        <g id="grp5" opacity="0" transform="translate(14 50)">
+                          <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
+                          <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
+                        </g>
+
+                        <g id="grp4" opacity="0" transform="translate(35 50)">
+                          <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
+                          <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
+                        </g>
+
+                        <g id="grp1" opacity="0" transform="translate(24)">
+                          <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
+                          <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
+                        </g>
+                      </g>
+                    </svg>
+                  </label>
+                  <button @click="checkCheckbox(item)">Check Checkbox</button>
+
+
+
+
+                </div>
                 <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
                   <div class="mb-4 text-center p-3 rounded iq-thumb">
                     <div class="iq-image-overlay"></div>
+
                     <img @click="getFiles(item.filename)"  src="../../../assets/images/layouts/page-1/pdf.png" class="img-fluid" alt="image1">
                   </div>
                   <h6 ref="ad">{{item.filename}}</h6>
@@ -840,11 +651,139 @@
   </body>
   </html>
 </template>
+<style>
+
+body{margin:0; padding:0; -webkit-font-smoothing: antialiased; font-family:arial;}
+
+#main-content{display:flex; width:100vw; height:100vh; background:white; align-items:center; justify-content:center; text-align:center;}
+
+h1{font-size:14px; font-weight:400; margin:10px 0 0 0; color:#888888;}
+
+a{font-size:12px; font-weight:bold; margin-top:10px; display:inline-block; text-decoration:none; color:#008A68;}
+
+svg{
+  cursor:pointer; overflow:visible; width:60px;
+  #heart{transform-origin:center; animation:animateHeartOut .3s linear forwards;}
+  #main-circ{transform-origin:29.5px 29.5px;}
+}
+
+.checkbox{display: none;}
+
+.checkbox:checked + label svg{
+  #heart{transform:scale(.2); fill:#E2264D; animation:animateHeart .3s linear forwards .25s;}
+  #main-circ{transition:all 2s; animation:animateCircle .3s linear forwards; opacity:1;}
+  #grp1{
+    opacity:1; transition:.1s all .3s;
+    #oval1{
+      transform:scale(0) translate(0, -30px);
+      transform-origin:0 0 0;
+      transition:.5s transform .3s;}
+    #oval2{
+      transform:scale(0) translate(10px, -50px);
+      transform-origin:0 0 0;
+      transition:1.5s transform .3s;}
+  }
+  #grp2{
+    opacity:1; transition:.1s all .3s;
+    #oval1{
+      transform:scale(0) translate(30px, -15px);
+      transform-origin:0 0 0;
+      transition:.5s transform .3s;}
+    #oval2{
+      transform:scale(0) translate(60px, -15px);
+      transform-origin:0 0 0;
+      transition:1.5s transform .3s;}
+  }
+  #grp3{
+    opacity:1; transition:.1s all .3s;
+    #oval1{
+      transform:scale(0) translate(30px, 0px);
+      transform-origin:0 0 0;
+      transition:.5s transform .3s;}
+    #oval2{
+      transform:scale(0) translate(60px, 10px);
+      transform-origin:0 0 0;
+      transition:1.5s transform .3s;}
+  }
+  #grp4{
+    opacity:1; transition:.1s all .3s;
+    #oval1{
+      transform:scale(0) translate(30px, 15px);
+      transform-origin:0 0 0;
+      transition:.5s transform .3s;}
+    #oval2{
+      transform:scale(0) translate(40px, 50px);
+      transform-origin:0 0 0;
+      transition:1.5s transform .3s;}
+  }
+  #grp5{
+    opacity:1; transition:.1s all .3s;
+    #oval1{
+      transform:scale(0) translate(-10px, 20px);
+      transform-origin:0 0 0;
+      transition:.5s transform .3s;}
+    #oval2{
+      transform:scale(0) translate(-60px, 30px);
+      transform-origin:0 0 0;
+      transition:1.5s transform .3s;}
+  }
+  #grp6{
+    opacity:1; transition:.1s all .3s;
+    #oval1{
+      transform:scale(0) translate(-30px, 0px);
+      transform-origin:0 0 0;
+      transition:.5s transform .3s;}
+    #oval2{
+      transform:scale(0) translate(-60px, -5px);
+      transform-origin:0 0 0;
+      transition:1.5s transform .3s;}
+  }
+  #grp7{
+    opacity:1; transition:.1s all .3s;
+    #oval1{
+      transform:scale(0) translate(-30px, -15px);
+      transform-origin:0 0 0;
+      transition:.5s transform .3s;}
+    #oval2{
+      transform:scale(0) translate(-55px, -30px);
+      transform-origin:0 0 0;
+      transition:1.5s transform .3s;}
+  }
+  #grp2{opacity:1; transition:.1s opacity .3s;}
+  #grp3{opacity:1; transition:.1s opacity .3s;}
+  #grp4{opacity:1; transition:.1s opacity .3s;}
+  #grp5{opacity:1; transition:.1s opacity .3s;}
+  #grp6{opacity:1; transition:.1s opacity .3s;}
+  #grp7{opacity:1; transition:.1s opacity .3s;}
+}
+
+@keyframes animateCircle{
+  40%{transform:scale(10); opacity:1; fill:#DD4688;}
+  55%{transform:scale(11); opacity:1; fill:#D46ABF;}
+  65%{transform:scale(12); opacity:1; fill:#CC8EF5;}
+  75%{transform:scale(13); opacity:1; fill:transparent; stroke:#CC8EF5; stroke-width:.5;}
+  85%{transform:scale(17); opacity:1; fill:transparent; stroke:#CC8EF5; stroke-width:.2;}
+  95%{transform:scale(18); opacity:1; fill:transparent; stroke:#CC8EF5; stroke-width:.1;}
+  100%{transform:scale(19); opacity:1; fill:transparent; stroke:#CC8EF5; stroke-width:0;}
+}
+
+@keyframes animateHeart{
+  0%{transform:scale(.2);}
+  40%{transform:scale(1.2);}
+  100%{transform:scale(1);}
+}
+
+@keyframes animateHeartOut{
+  0%{transform:scale(1.4);}
+  100%{transform:scale(1);}
+}
+</style>
+
 
 <script>
 
 
-import {getAll, getFiles} from "@/common/user-service";
+import {getAll} from "@/common/user-service";
 import {getUser} from "@/common/user-service";
 import DropFile from "@/components/DropFile.vue";
 import axios from "axios";
@@ -854,23 +793,30 @@ import axios from "axios";
 export default {
   name: 'HelloWorld',
   components: {DropFile},
+  el: '.checkbox',
   props: {
     msg: String
   },
-  data(){
+  data() {
     return {
-      files:[],
-      user:[],
-      jwt:"",
-      durum:[],
+      files: [],
+      user: [],
+      jwt: "",
+      durum: [],
+      isChecked: false,
+      datsa: {
+        filename:"",
+        isCheck:false,
+
+      }
 
 
     }
   },
   created() {
-    this.jwt=localStorage.getItem('accessToken');
+    this.jwt = localStorage.getItem('accessToken');
     const customHeaders = {
-      'Authorization':"Bearer " +this.jwt,
+      'Authorization': "Bearer " + this.jwt,
 
     };
 
@@ -878,55 +824,25 @@ export default {
     this.getuser(customHeaders);
 
 
-  },methods:{
+  }, methods: {
 
-    getfilelists(customHeaders){
+    getfilelists(customHeaders) {
 
-      getAll(customHeaders).then(response=>{
-        this.files=response.data;
+      getAll(customHeaders).then(response => {
+        this.files = response.data;
       })
     },
-    getuser(customHeaders){
-      getUser(customHeaders).then(response=>{
-        this.user=response.data;
+    getuser(customHeaders) {
+      getUser(customHeaders).then(response => {
+        this.user = response.data;
         console.log(this.user);
       })
-    },
-    async downloadFile(filename) {
-      try {
-        this.jwt=localStorage.getItem('accessToken');
-        const customHeaders = {
-          'Authorization':"Bearer " +this.jwt,
-
-        };
-
-        const response = await getFiles(customHeaders, filename);
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-
-        // Dosyayı indirmek için bir <a> etiketi oluşturma ve tıklama işlemi
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', filename);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        this.durum=response;
-        if(this.durum.data.processes=="İndirildi."){
-          alert("İndirildi.");
-        }
-
-
-      } catch (error) {
-        console.error('Dosya indirme hatası:', error);
-        // Hata durumunda kullanıcıya bir mesaj gösterebilirsiniz
-      }
     },
     async getFiles(filename) {
       try {
         const response = await axios.get(`user/download/${filename}`, {
           headers: {
-            'Authorization':"Bearer " +this.jwt,
+            'Authorization': "Bearer " + this.jwt,
 
           },
           responseType: 'blob' // Dosyayı binary olarak almak için blob kullanılır
@@ -946,13 +862,33 @@ export default {
       } catch (error) {
         throw new Error('Dosya alınamadı:', error);
       }
+    },
+    async checkCheckbox(item) {
+
+      console.log(this.datsa);
+      console.log(item.isChecked);
+      if (item.isChecked) {
+        this.datsa.filename=item.filename;
+        this.datsa.isCheck=item.isChecked;
+        const response = await axios.post(`user/favourite`, this.datsa, {
+          headers: {
+            'Authorization': "Bearer " + this.jwt,
+
+          },
+        });
+        console.log(response);
+
+        console.log(`${item.filename} is checked!`);
+        // Seçili ise yapılacak işlemleri burada gerçekleştirin.
+      } else {
+        console.log(`${item.filename} is not checked.`);
+        // Seçili değilse yapılacak işlemleri burada gerçekleştirin.
+      }
     }
   }
 
 
-
-
-
 }
+
 </script>
 

@@ -10,3 +10,13 @@ services:
     environment:
       POSTGRES_USERNAME: postgre
       POSTGRES_PASSWORD: 123
+
+  elasticsearch:
+    image: elasticsearch:8.7.1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: false
+      xpack.security.enrollment.enabled: false

@@ -3,6 +3,7 @@ package com.yasu.ftpLogic.controller;
 import com.yasu.ftpLogic.configs.JwtUtils;
 import com.yasu.ftpLogic.dto.UploadRequest;
 import com.yasu.ftpLogic.dto.UserDto;
+import com.yasu.ftpLogic.entity.FavouriteFile;
 import com.yasu.ftpLogic.entity.FileDetail;
 import com.yasu.ftpLogic.entity.UserEntity;
 import com.yasu.ftpLogic.errorHandling.ErrorMessage;
@@ -56,7 +57,7 @@ public class UserController {
            ErrorMessage isGiddimi= client.sendFile(tempFile.getAbsolutePath(), username,file.getOriginalFilename());
 
            if(isGiddimi.getCode().equals("200")){
-               userService.updateCapacity(username,isGiddimi.getUsageSize());
+               userService.updateCapacity(username,isGiddimi.getUsageSize(),file.getOriginalFilename());
                if (tempFile != null && tempFile.exists()) {
                    tempFile.delete();
                }
@@ -85,6 +86,7 @@ public class UserController {
         String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
         return  userService.getUser(username);
     }
+    /*
     @PostMapping("/downloads/{filename}")
     public statusProcesses downloads(@RequestHeader("Authorization")String token,@PathVariable("filename") String filename){
         Client client  = new Client("localhost", 3456);
@@ -97,6 +99,8 @@ public class UserController {
         else
             return new statusProcesses("İndirilemedi");
     }
+
+     */
     @GetMapping("/download/{filename}")
     public ResponseEntity<Resource> downloadFile(
             @RequestHeader("Authorization") String token,
@@ -121,7 +125,13 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PostMapping("/favourite")
+    public ResponseEntity<?> favourite(@RequestHeader("Authorization") String token, @RequestBody FavouriteFile favouriteFile) {
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(6));
 
+        userService.updateFavourite(username,favouriteFile);
+        return ResponseEntity.ok("İŞLEM DAMAM");
+    }
 
     @PostMapping("/signUp")
     public ResponseEntity<?> signUp(@RequestBody UserEntity userEntity){

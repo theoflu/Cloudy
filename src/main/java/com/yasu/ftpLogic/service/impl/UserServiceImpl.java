@@ -1,7 +1,10 @@
 package com.yasu.ftpLogic.service.impl;
 
 import com.yasu.ftpLogic.dto.UserDto;
+import com.yasu.ftpLogic.entity.FavouriteFile;
 import com.yasu.ftpLogic.entity.UserEntity;
+import com.yasu.ftpLogic.entity.UserFileEntitiy;
+import com.yasu.ftpLogic.repository.FilesRepository;
 import com.yasu.ftpLogic.repository.UserRepository;
 import com.yasu.ftpLogic.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final FilesRepository filesRepository;
     @Override
     public UserDto signUp(UserEntity userEntity) {
         modelMapper.map(userRepository.save(userEntity), UserDto.class);
@@ -54,10 +58,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public double updateCapacity(String username,Long size) {
+    public double updateCapacity(String username,Long size,String filename) {
         UserEntity user= userRepository.findUserEntityByUsername(username);
         user.setUsageSize(size/1000000000d);
+        UserFileEntitiy users=UserFileEntitiy.
+                builder()
+                .userid(user.getId())
+                .isFavourite(true)
+                .filename(filename)
+                .build();
+        filesRepository.save(users);
         userRepository.save(user);
         return user.getUsageSize();
+    }
+
+    @Override
+    public void updateFavourite (String username, FavouriteFile favouriteFile) {
+        UserEntity user= userRepository.findUserEntityByUsername(username);
+        UserFileEntitiy files = filesRepository.findByUseridAndFilename(user.getId(), favouriteFile.getFilename());
+        files.setFavourite(favouriteFile.getIsCheck());
+        filesRepository.save(files);
+
+    }
+
+    @Override
+    public List<UserFileEntitiy> userFileList() {
+
+        return null;
+
     }
 }
