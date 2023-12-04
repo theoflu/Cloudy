@@ -57,20 +57,26 @@ public class Client {
             PrintWriter writer = new PrintWriter(os, true);
 
             File file = new File(filePath);
+            FileDetail fileDetail= FileDetail.
+                    builder()
+                    .filepath(file.getPath())
+                    .filename(file.getName())
+                    .filesize(folderSize(file))
+                    .build();
                 if (file.exists() && file.isFile()) {
                     long fileSize = file.length();
                     sendFileNameAndSize(writer, filePath, fileSize,file.getName(),downloadToHere);
                     sendFileData(os, file);
                     System.out.println("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName());
                     listFiles("C:\\user\\"+username);
-                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName(),"200",1L);
+                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName(),"200",fileDetail,0L);
 
 
 
                 } else {
                     System.out.println("Belirtilen dosya bulunamadı veya bir dosya değil.");
                     notFound(writer,"notFoundFile");
-                    return new ErrorMessage("Dosya gönderilmedi.Belirtilen dosya bulunamadı veya bir dosya değil. "+ "C:\\user\\"+username+"\\"+file.getName(),"",0L);
+                    return new ErrorMessage("Dosya gönderilmedi.Belirtilen dosya bulunamadı veya bir dosya değil. "+ "C:\\user\\"+username+"\\"+file.getName(),"",fileDetail,0L);
 
                 }
 
@@ -78,7 +84,7 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ErrorMessage("Dosya gönderilemedi ","InsufficientStorageSpace",0L);
+        return new ErrorMessage("Dosya gönderilemedi ","InsufficientStorageSpace",null,0L);
 
     }
 
@@ -95,8 +101,14 @@ public class Client {
 
             File file = new File(filePath);
 
-            long a=21474836480L;
+            long a=20000036480L;
             File file2 = new File("C:\\user\\"+username);
+            FileDetail fileDetail= FileDetail.
+                    builder()
+                    .filepath(file.getPath())
+                    .filename(orginalName)
+                    .filesize(folderSize(file2))
+                    .build();
             if(folderSize(file2)>= a)
             {
 
@@ -114,14 +126,15 @@ public class Client {
                     System.out.println("Kalan depolama alanı : " + capcity  );
                     System.out.println("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName());
                     listFiles("C:\\user\\"+username);
-                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+orginalName,"200",folderSize(file2));
 
+                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+orginalName,"200",fileDetail,capcity);
+//error mesage ile dosya detaylarını döncez
 
 
                 } else {
                     System.out.println("Belirtilen dosya bulunamadı veya bir dosya değil.");
                     notFound(writer,"notFoundFile");
-                    return new ErrorMessage("Dosya gönderilmedi.Belirtilen dosya bulunamadı veya bir dosya değil. "+ "C:\\user\\"+username+"\\"+file.getName(),"",folderSize(file2));
+                    return new ErrorMessage("Dosya gönderilmedi.Belirtilen dosya bulunamadı veya bir dosya değil. "+ "C:\\user\\"+username+"\\"+file.getName(),"",fileDetail,0L);
 
                 }
             }
@@ -133,7 +146,7 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ErrorMessage("Dosya gönderilemedi ","InsufficientStorageSpace",0L);
+        return new ErrorMessage("Dosya gönderilemedi ","InsufficientStorageSpace",null,0L);
 
     }
 
@@ -163,6 +176,7 @@ public class Client {
         }
     }
 
+
     public List<FileDetail> listFiles(String directoryPath) {
         File directory = new File(directoryPath);
 
@@ -174,6 +188,7 @@ public class Client {
                 System.out.println("Klasördeki Dosyalar:");
                 for (File file : files) {
                   if (file.isFile()) {
+
                       System.out.println(file.getName());
                       FileDetail fileDetail=FileDetail.builder()
                               .filesize(file.length())

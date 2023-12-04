@@ -2,6 +2,7 @@ package com.yasu.ftpLogic.service;
 
 import com.yasu.ftpLogic.dto.UserDto;
 import com.yasu.ftpLogic.entity.FavouriteFile;
+import com.yasu.ftpLogic.entity.FileDetail;
 import com.yasu.ftpLogic.entity.UserEntity;
 import com.yasu.ftpLogic.entity.UserFileEntitiy;
 
@@ -13,8 +14,8 @@ public interface UserService {
     UserEntity getUser(String username);
     String delete(Long id);
     List<UserDto> userList();
-   double updateCapacity(String username,Long size,String filename);
+   double updateCapacity(String username,FileDetail fileDetail,String filename,long capacity);
 
    void updateFavourite (String username, FavouriteFile favouriteFile);
-   List<UserFileEntitiy> userFileList();
+   List<UserFileEntitiy> userFileList(String username);
 }

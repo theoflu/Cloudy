@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class FavouriteFile {
     private String filename;
     private Boolean isCheck;
+    private FileDetail fileDetail;
 
 
 }

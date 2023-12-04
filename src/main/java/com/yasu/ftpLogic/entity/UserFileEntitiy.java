@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import java.util.List;
+
 @Data
 @Document(indexName = "files")
 @EqualsAndHashCode(of="id")
@@ -18,5 +20,7 @@ public class UserFileEntitiy {
     private long userid;
     private boolean isFavourite;
     private String filename;
+    private FileDetail fileDetail;
+
 
 }

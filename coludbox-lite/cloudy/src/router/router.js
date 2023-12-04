@@ -1,14 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HelloWorld from "@/components/HelloWorld.vue";
 import Login from "@/components/UserLogin.vue";
 import UserRegister from "@/components/UserRegister.vue";
 import DownloadFiles from "@/components/DownloadFiles.vue";
+import FavouritePage from "@/components/FavouritePage.vue";
+import MainMenu from "@/components/MainMenu.vue";
+import DropDownComponent from "@/components/DropDownComponent.vue";
 
 const routes = [
     {
         path: '/menu',
         name: 'menu',
-        component: HelloWorld
+        component: MainMenu
     }
     , {
         path: '/',
@@ -23,6 +25,16 @@ const routes = [
         path: '/downloadfile',
         name: 'downloadfile',
         component: DownloadFiles
+    }
+    , {
+        path: '/favourite',
+        name: 'favourite',
+        component: FavouritePage
+    }
+    , {
+        path: '/dropworncomp',
+        name: 'dropworncomp',
+        component: DropDownComponent
     }
 
 

@@ -6,6 +6,7 @@ import com.yasu.ftpLogic.dto.UserDto;
 import com.yasu.ftpLogic.entity.FavouriteFile;
 import com.yasu.ftpLogic.entity.FileDetail;
 import com.yasu.ftpLogic.entity.UserEntity;
+import com.yasu.ftpLogic.entity.UserFileEntitiy;
 import com.yasu.ftpLogic.errorHandling.ErrorMessage;
 import com.yasu.ftpLogic.errorHandling.statusProcesses;
 import com.yasu.ftpLogic.ftpStuff.Client;
@@ -33,14 +34,14 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final JwtUtils jwtUtils;
-
+    private static final  String path="C:\\user\\";
 
     @PostMapping("/upload")
     public statusProcesses upload(@RequestHeader("Authorization")String token, @RequestParam("file") MultipartFile file){
         try {
             // client giricek tüm işlemlerini bitirdikten sonra çıkıcak şekilde düzeltelim
             Client client = new Client("localhost", 3456);
-            File targetFile=new File("C:\\user\\as3d");
+
 
             File tempFile = File.createTempFile("uploaded", file.getOriginalFilename());
             try (InputStream inputStream = file.getInputStream();
@@ -57,7 +58,7 @@ public class UserController {
            ErrorMessage isGiddimi= client.sendFile(tempFile.getAbsolutePath(), username,file.getOriginalFilename());
 
            if(isGiddimi.getCode().equals("200")){
-               userService.updateCapacity(username,isGiddimi.getUsageSize(),file.getOriginalFilename());
+               userService.updateCapacity(username,isGiddimi.getFileDetail(), file.getOriginalFilename(),isGiddimi.getCapacity());
                if (tempFile != null && tempFile.exists()) {
                    tempFile.delete();
                }
@@ -75,11 +76,17 @@ public class UserController {
 
     }
     @GetMapping("/fileslist")
-    public List<FileDetail> filesList(@RequestHeader("Authorization")String token){
+    public List<UserFileEntitiy> filesList(@RequestHeader("Authorization")String token){
+        /*
         Client client  = new Client("localhost", 3456);
         String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
         client.listFiles("C:\\user\\"+username);
         return client.listFiles("C:\\user\\"+username);
+
+         */
+        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
+       List<UserFileEntitiy> files= userService.userFileList(username);
+        return  files;
     }
     @GetMapping("/getuser")
     public UserEntity getUser(@RequestHeader("Authorization")String token){

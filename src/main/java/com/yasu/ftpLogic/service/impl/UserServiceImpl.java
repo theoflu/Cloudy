@@ -2,6 +2,7 @@ package com.yasu.ftpLogic.service.impl;
 
 import com.yasu.ftpLogic.dto.UserDto;
 import com.yasu.ftpLogic.entity.FavouriteFile;
+import com.yasu.ftpLogic.entity.FileDetail;
 import com.yasu.ftpLogic.entity.UserEntity;
 import com.yasu.ftpLogic.entity.UserFileEntitiy;
 import com.yasu.ftpLogic.repository.FilesRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,9 +37,9 @@ public class UserServiceImpl implements UserService {
         UserEntity entity= userRepository.findByEmail(userEntity.getEmail());
         if(passwordEncoder.matches(userEntity.getPassword(),entity.getPassword()))
         {
-            return "Başarlı";
+            return "Başarılı";
         }
-        return "Başarsoz";
+        return "Başarısız";
     }
 
     @Override
@@ -58,17 +60,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public double updateCapacity(String username,Long size,String filename) {
+    public double updateCapacity(String username, FileDetail fileDetail, String filename,long capacity) {
         UserEntity user= userRepository.findUserEntityByUsername(username);
-        user.setUsageSize(size/1000000000d);
+        user.setUsageSize(capacity/1000000000d);
         UserFileEntitiy users=UserFileEntitiy.
                 builder()
                 .userid(user.getId())
-                .isFavourite(true)
+                .isFavourite(false)
                 .filename(filename)
+                .fileDetail(fileDetail)
                 .build();
-        filesRepository.save(users);
-        userRepository.save(user);
+        Optional<Boolean> a=filesRepository.findByFilenameAndUserid(filename,user.getId());
+       if(a.isEmpty()) {
+           filesRepository.save(users);
+       }
+
+
+
+       userRepository.save(user);
         return user.getUsageSize();
     }
 
@@ -82,9 +91,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserFileEntitiy> userFileList() {
-
-        return null;
+    public List<UserFileEntitiy> userFileList(String username) {
+        UserEntity user= userRepository.findUserEntityByUsername(username);
+        List<UserFileEntitiy> files= filesRepository.findByUserid(user.getId());
+        return files;
 
     }
 }
