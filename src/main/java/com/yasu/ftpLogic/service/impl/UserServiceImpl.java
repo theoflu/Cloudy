@@ -1,11 +1,9 @@
 package com.yasu.ftpLogic.service.impl;
 
 import com.yasu.ftpLogic.dto.UserDto;
-import com.yasu.ftpLogic.entity.FavouriteFile;
-import com.yasu.ftpLogic.entity.FileDetail;
-import com.yasu.ftpLogic.entity.UserEntity;
-import com.yasu.ftpLogic.entity.UserFileEntitiy;
+import com.yasu.ftpLogic.entity.*;
 import com.yasu.ftpLogic.repository.FilesRepository;
+import com.yasu.ftpLogic.repository.TrashCanRepository;
 import com.yasu.ftpLogic.repository.UserRepository;
 import com.yasu.ftpLogic.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,6 +23,22 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final FilesRepository filesRepository;
+    private final TrashCanRepository trashCanRepository;
+
+    @Override
+    public void saveTrashcan(String username ,List<FileDetail> fileDetail){
+      trashCanRepository.findByUsername(username).ifPresentOrElse(user-> {
+          user.setFileDetail(fileDetail);
+          trashCanRepository.save(user);
+              } ,
+              ()->
+                      trashCanRepository.save(  TrashCanFiles.builder()
+                              .username(username)
+                              .fileDetail(fileDetail)
+                              .build())
+              );
+
+    }
     @Override
     public UserDto signUp(UserEntity userEntity) {
         modelMapper.map(userRepository.save(userEntity), UserDto.class);

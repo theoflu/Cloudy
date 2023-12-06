@@ -22,6 +22,8 @@ public class UserEntity {
     private String email;
     @Column(name = "folder_path")
     private String folder;
+    @Column(name = "usage_size")
+
     private double usageSize;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(  name = "user_roles",

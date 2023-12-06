@@ -13,5 +13,6 @@ public class FileDetail {
     private String filename;
     private String filepath;
     private long filesize;
+    private long lastmodified;
 
 }

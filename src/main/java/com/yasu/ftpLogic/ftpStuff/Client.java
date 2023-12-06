@@ -1,7 +1,9 @@
 package com.yasu.ftpLogic.ftpStuff;
 
+import co.elastic.clients.util.DateTime;
 import com.yasu.ftpLogic.entity.FileDetail;
 import com.yasu.ftpLogic.errorHandling.ErrorMessage;
+import com.yasu.ftpLogic.repository.TrashCanRepository;
 import org.aspectj.bridge.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,14 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class Client {
     private  final  String serverAddress;
     private final int serverPort;
-
 
     public Client(String serverAddress, int serverPort) {
         this.serverAddress = serverAddress;
@@ -35,57 +36,64 @@ public class Client {
         }
         return length;
     }
-    private void basla(){
-        try{
-            Socket socket = new Socket(serverAddress, serverPort);
-            socket.close();
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
 
-    }
-    public ErrorMessage downloadFile(String filePath, String username,String downloadToHere){
-        try  (Socket socket = new Socket(serverAddress, serverPort)) {
-            try {
+    public void check(){
+        String folderPath = "C:\\user\\as3d\\TrashCan"; // Silinecek dosyaların bulunduğu klasör yolu
 
-                Thread.sleep(2000); // Millisaniye cinsinden süreyi belirtir (5 saniye = 5000 milisaniye)
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            OutputStream os = socket.getOutputStream();
-            PrintWriter writer = new PrintWriter(os, true);
+        File folder = new File(folderPath);
 
-            File file = new File(filePath);
-            FileDetail fileDetail= FileDetail.
-                    builder()
-                    .filepath(file.getPath())
-                    .filename(file.getName())
-                    .filesize(folderSize(file))
-                    .build();
-                if (file.exists() && file.isFile()) {
-                    long fileSize = file.length();
-                    sendFileNameAndSize(writer, filePath, fileSize,file.getName(),downloadToHere);
-                    sendFileData(os, file);
-                    System.out.println("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName());
-                    listFiles("C:\\user\\"+username);
-                    return new ErrorMessage("Dosya gönderildi: " + "C:\\user\\"+username+"\\"+file.getName(),"200",fileDetail,0L);
+        if (folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            long currentTime = System.currentTimeMillis();
 
+            if (files != null) {
+                for (File file : files) {
+                    long lastModified = file.lastModified();
+                    long thirtyDaysInMillis =  30L * 24 * 60 * 60 * 1000; // 30 günün milisaniye cinsinden değeri
 
-
-                } else {
-                    System.out.println("Belirtilen dosya bulunamadı veya bir dosya değil.");
-                    notFound(writer,"notFoundFile");
-                    return new ErrorMessage("Dosya gönderilmedi.Belirtilen dosya bulunamadı veya bir dosya değil. "+ "C:\\user\\"+username+"\\"+file.getName(),"",fileDetail,0L);
-
+                    if (currentTime - lastModified > thirtyDaysInMillis) {
+                        boolean isDeleted = file.delete();
+                        if (isDeleted) {
+                            System.out.println("Dosya başarıyla silindi: " + file.getAbsolutePath());
+                        } else {
+                            System.out.println("Dosya silinemedi: " + file.getAbsolutePath());
+                        }
+                    }
                 }
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            }
+        } else {
+            System.out.println("Belirtilen klasör bulunamadı veya bir klasör değil.");
         }
-        return new ErrorMessage("Dosya gönderilemedi ","InsufficientStorageSpace",null,0L);
+    }
+    public List<FileDetail> moveFile(String filename, String username) {
+        String sourcePath, destinationPath;
 
+        sourcePath = "C:\\user\\" + username + "\\" + filename;
+        destinationPath = "C:\\user\\" + username + "\\TrashCan\\" + filename;
+        File sourceFile = new File(sourcePath);
+        File destinationFile = new File(destinationPath);
+        long currentTime = System.currentTimeMillis();
+        //1 ay sonrasını hesapladık futuretime
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(currentTime);
+        calendar.add(Calendar.MONTH, 1);
+        long futureTime = calendar.getTimeInMillis();
+        System.out.println("1 ay öncesinin zamanı: " + currentTime);
+        System.out.println("1 ay sonrasının zamanı: " + futureTime);
+        if (sourceFile.exists()) {
+            sourceFile.setLastModified(currentTime);
+            sourceFile.renameTo(destinationFile);
+           return listFiles("C:\\user\\" + username + "\\TrashCan");
+        }
+        else if(destinationFile.exists()){
+            destinationFile.renameTo(sourceFile);
+            return listFiles("C:\\user\\" + username + "\\TrashCan");
+
+        }
+        else {
+            System.out.println("Kaynak dosya bulunamadı.");
+            return null;
+        }
     }
 
     public ErrorMessage sendFile(String filePath, String username,String orginalName){
@@ -194,6 +202,7 @@ public class Client {
                               .filesize(file.length())
                               .filepath(file.getPath())
                               .filename(file.getName())
+                              .lastmodified(file.lastModified())
                               .build();
                      a.add(fileDetail);
 
@@ -212,9 +221,4 @@ public class Client {
 
 
 
-    public static void main(String[] args) {
-        //Client client = new Client("localhost", 3456);
-       //client.sendFile("C:\\Users\\yusuf\\OneDrive\\Masaüstü\\haftalık.rar","as3d");
-
-    }
 }

@@ -21,6 +21,7 @@ public class UserFileEntitiy {
     private boolean isFavourite;
     private String filename;
     private FileDetail fileDetail;
+    private TrashCanFiles trashCanFiles;
 
 
 }

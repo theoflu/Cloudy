@@ -41,8 +41,6 @@ public class UserController {
         try {
             // client giricek tüm işlemlerini bitirdikten sonra çıkıcak şekilde düzeltelim
             Client client = new Client("localhost", 3456);
-
-
             File tempFile = File.createTempFile("uploaded", file.getOriginalFilename());
             try (InputStream inputStream = file.getInputStream();
                  OutputStream outputStream = new FileOutputStream(tempFile)) {
@@ -75,6 +73,15 @@ public class UserController {
         }
 
     }
+    @GetMapping("/movetotrash/{filename}")
+    public void moveToTrash(@RequestHeader("Authorization")String token ,@PathVariable String filename){
+        Client client  = new Client("localhost", 3456);
+        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
+        userService.saveTrashcan( username, client.moveFile(filename,username));
+        client.check();
+
+    }
+
     @GetMapping("/fileslist")
     public List<UserFileEntitiy> filesList(@RequestHeader("Authorization")String token){
         /*

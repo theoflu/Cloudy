@@ -15,7 +15,10 @@ import com.yasu.ftpLogic.entity.UserEntity;
 import com.yasu.ftpLogic.repository.RoleRepository;
 import com.yasu.ftpLogic.repository.UserRepository;
 
+import com.yasu.ftpLogic.serverStuff.ServerRequests;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,28 +26,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*", maxAge = 3600,allowedHeaders = "*")
-
+@RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
-    JwtUtils jwtUtils;
+    private final AuthenticationManager authenticationManager;
+    private final  UserRepository userRepository;
+    private final  RoleRepository roleRepository;
+    private final PasswordEncoder encoder;
+    private final JwtUtils jwtUtils;
+    private final ServerRequests serverRequests;
 
     @PostMapping("/signin")
     public JwtResponse authenticateUser( @RequestBody UserEntity loginRequest) {
@@ -68,6 +64,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
+    @Transactional
     public ResponseEntity<?> registerUser( @RequestBody UserEntity signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
@@ -87,24 +84,12 @@ public class AuthController {
         UserEntity user = UserEntity.builder().email(signUpRequest.getEmail())
                 .username(signUpRequest.getUsername())
                 .password(encoder.encode(signUpRequest.getPassword()))
-                .folder("C:\\user\\"+signUpRequest.getUsername())
+                .folder("C:\\user\\" + signUpRequest.getUsername())
                 .roles(roles)
                 .build();
-        try {
-            File file = new File(user.getFolder());
-            if (!file.exists()) {
-                if (file.mkdir()) {
-                    System.out.println("Directory is created!");
-                } else {
-                    System.out.println("Failed to create directory!");
-                }
-            }
-        }
-        catch (Exception e){
-            return ResponseEntity.ok("Exception "+e.getMessage());
 
-        }
-        userRepository.save(user);
+        serverRequests.createDirectories(user.getFolder()).getStatusCode();
+
         return ResponseEntity.ok("User registered successfully!");
     }
 }

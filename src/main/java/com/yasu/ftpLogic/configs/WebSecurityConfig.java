@@ -77,10 +77,12 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                             requestMatchers("/api/auth/signUp").permitAll()
                                 .requestMatchers("/api/auth/signin").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
-
-
+                                .requestMatchers("/user/list").permitAll()
+                                .requestMatchers("/user/list").permitAll()
+                                .requestMatchers("/server/createDirectories").permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
                                 .anyRequest().authenticated()
+
                 );
 
         http.authenticationProvider(authenticationProvider());
@@ -93,7 +95,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000/",""));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000/","http://localhost:8080/","http://localhost:8081/"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("OPTIONS");
