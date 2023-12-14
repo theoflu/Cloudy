@@ -2,6 +2,7 @@ package com.yasu.ftpLogic.service.impl;
 
 import com.yasu.ftpLogic.dto.UserDto;
 import com.yasu.ftpLogic.entity.*;
+import com.yasu.ftpLogic.ftpStuff.Client;
 import com.yasu.ftpLogic.repository.FilesRepository;
 import com.yasu.ftpLogic.repository.TrashCanRepository;
 import com.yasu.ftpLogic.repository.UserRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.List;
@@ -26,18 +28,49 @@ public class UserServiceImpl implements UserService {
     private final TrashCanRepository trashCanRepository;
 
     @Override
-    public void saveTrashcan(String username ,List<FileDetail> fileDetail){
-      trashCanRepository.findByUsername(username).ifPresentOrElse(user-> {
-          user.setFileDetail(fileDetail);
-          trashCanRepository.save(user);
-              } ,
-              ()->
-                      trashCanRepository.save(  TrashCanFiles.builder()
-                              .username(username)
-                              .fileDetail(fileDetail)
-                              .build())
-              );
+    @Transactional
+    public void saveTrashcan(String username ,List<FileDetail> fileDetail,String filename){
+        UserEntity userr= userRepository.findUserEntityByUsername(username);
+        UserFileEntitiy files = filesRepository.findByUseridAndFilename(userr.getId(), filename);
+        if(files.isTrashCanFiles()){
+            files.setTrashCanFiles(false);
+            files.setFavourite(false);
+            trashCanRepository.findByUsername(username).ifPresentOrElse(user-> {
+                        user.setFileDetail(fileDetail);
+                        trashCanRepository.save(user);
+                    } ,
+                    ()->
+                    {
+                        trashCanRepository.save(TrashCanFiles.builder()
+                                .username(username)
+                                .fileDetail(fileDetail)
+                                .build());
 
+                    }
+
+            );
+
+        }
+        else{
+            files.setTrashCanFiles(true);
+            files.setFavourite(false);
+            trashCanRepository.findByUsername(username).ifPresentOrElse(user-> {
+                        user.setFileDetail(fileDetail);
+                        trashCanRepository.save(user);
+                    } ,
+                    ()->
+                    {
+                        trashCanRepository.save(TrashCanFiles.builder()
+                                .username(username)
+                                .fileDetail(fileDetail)
+                                .build());
+
+                    }
+
+            );
+
+        }
+        filesRepository.save(files);
     }
     @Override
     public UserDto signUp(UserEntity userEntity) {
@@ -63,8 +96,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String delete(Long id) {
-        userRepository.deleteById(id);
+    public String delete(String username, String filename) {
+        UserEntity user=userRepository.findUserEntityByUsername(username);
+        filesRepository.deleteByUseridAndFilename(user.getId(),filename);
         return "Silindi";
     }
 
@@ -73,9 +107,15 @@ public class UserServiceImpl implements UserService {
         List<UserEntity> users=userRepository.findAll();
         return users.stream().map(user->modelMapper.map(user,UserDto.class)).collect(Collectors.toList());
     }
+    @Override
+    public void updateCapacity(String username, String filename,long capacity) {
+        UserEntity user= userRepository.findUserEntityByUsername(username);
+        user.setUsageSize(capacity/1000000000d);
+        userRepository.save(user);
+    }
 
     @Override
-    public double updateCapacity(String username, FileDetail fileDetail, String filename,long capacity) {
+    public double saveUserFile(String username, FileDetail fileDetail, String filename,long capacity) {
         UserEntity user= userRepository.findUserEntityByUsername(username);
         user.setUsageSize(capacity/1000000000d);
         UserFileEntitiy users=UserFileEntitiy.
@@ -84,6 +124,7 @@ public class UserServiceImpl implements UserService {
                 .isFavourite(false)
                 .filename(filename)
                 .fileDetail(fileDetail)
+                .trashCanFiles(false)
                 .build();
         Optional<Boolean> a=filesRepository.findByFilenameAndUserid(filename,user.getId());
        if(a.isEmpty()) {

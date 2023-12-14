@@ -6,14 +6,14 @@ import com.yasu.ftpLogic.entity.*;
 import java.util.List;
 
 public interface UserService {
-    void saveTrashcan(String username , List<FileDetail> fileDetail);
+    void saveTrashcan(String username , List<FileDetail> fileDetail,String filename);
     UserDto signUp(UserEntity userEntity);
     String signIn(UserEntity entity);
     UserEntity getUser(String username);
-    String delete(Long id);
+    String delete(String username, String filename);
     List<UserDto> userList();
-   double updateCapacity(String username,FileDetail fileDetail,String filename,long capacity);
-
+   double saveUserFile(String username,FileDetail fileDetail,String filename,long capacity);
+   void updateCapacity(String username, String filename,long capacity);
    void updateFavourite (String username, FavouriteFile favouriteFile);
    List<UserFileEntitiy> userFileList(String username);
 }

@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface FilesRepository extends ElasticsearchRepository<UserFileEntitiy,Long> {
     UserFileEntitiy findByUseridAndFilename(Long id,String filename);
     Optional<Boolean> findByFilenameAndUserid(String filename, Long id);
+    Optional<Boolean> deleteByUseridAndFilename( Long id,String filename);
     List<UserFileEntitiy> findByUserid(Long id);
 }

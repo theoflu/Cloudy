@@ -10,7 +10,7 @@ import {FwbDropdown, FwbListGroup, FwbListGroupItem} from "flowbite-vue";
 
 export default defineComponent({
   components: { HelloWorld,FwbListGroupItem, FwbListGroup, FwbDropdown},
-  name: 'FavouritePage',
+  name: 'TrashcanComponent',
   el: '.checkbox',
   props: {
     msg: String
@@ -77,19 +77,17 @@ export default defineComponent({
       } catch (error) {
         throw new Error('Dosya alınamadı:', error);
       }
-    },
-    async checkCheckbox(item) {
-      this.datsa.filename=item.filename;
-      await axios.post(`user/favourite`, this.datsa, {
+    }, async deleteFile(filename){
+      const response = await axios.get(`user/delete/${filename}`, {
         headers: {
           'Authorization': "Bearer " + this.jwt,
-
         },
       });
+      console.log(response);
+      this.files = response.data;
 
-
-    },
-    async moveToTrash(filename) {
+    }
+,    async moveToTrash(filename) {
       try {
         const response = await axios.get(`user/movetotrash/${filename}`, {
           headers: {
@@ -122,7 +120,7 @@ export default defineComponent({
                     <thead>
                     <tr>
                       <th scope="col">Name</th>
-                      <th scope="col">FAV</th>
+                      <th scope="col">???</th>
                       <th scope="col">Last Edit</th>
                       <th scope="col">File Size</th>
                       <th scope="col"></th>
@@ -132,61 +130,18 @@ export default defineComponent({
 
                     <tr v-for='(item, index) in files' :key='index'>
 
-                      <td v-if="item.favourite!=false">
+                      <td v-if="item.trashCanFiles==true">
                         <div class="d-flex align-items-center">
                           <div class="mr-3">
-                            <a href="#"><img src="../../../assets/images/layouts/page-6/01.png" class="img-fluid avatar-30" alt="image1"></a>
+                            <a href="#"><img src="../../../assets/images/layouts/page-6/01.png" class="img-fluid avatar-30"  alt="image1"></a>
                           </div>
-                         {{item.filename}}
+                          {{item.filename}}
                         </div>
                       </td >
-                      <td v-if="item.favourite!=false">  <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.favourite" @change="checkCheckbox(item)" />
-                        <label :for="item.filename" >
-                          <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
-                            <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
-                              <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
-                              <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
-
-                              <g id="grp7" opacity="0" transform="translate(7 6)">
-                                <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
-                                <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
-                              </g>
-
-                              <g id="grp6" opacity="0" transform="translate(0 28)">
-                                <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
-                                <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
-                              </g>
-
-                              <g id="grp3" opacity="0" transform="translate(52 28)">
-                                <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
-                                <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
-                              </g>
-
-                              <g id="grp2" opacity="0" transform="translate(44 6)">
-                                <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
-                                <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
-                              </g>
-
-                              <g id="grp5" opacity="0" transform="translate(14 50)">
-                                <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
-                                <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
-                              </g>
-
-                              <g id="grp4" opacity="0" transform="translate(35 50)">
-                                <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
-                                <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
-                              </g>
-
-                              <g id="grp1" opacity="0" transform="translate(24)">
-                                <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
-                                <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
-                              </g>
-                            </g>
-                          </svg>
-                        </label></td>
-                      <td  v-if="item.favourite!=false">jan 21, 2020 me</td>
-                      <td v-if="item.favourite!=false">{{item.fileDetail.filesize/1000000000}} GB</td>
-                      <td  v-if="item.favourite!=false">
+                      <td v-if="item.trashCanFiles==true" > ?????</td>
+                      <td  v-if="item.trashCanFiles==true">jan 21, 2020 me</td>
+                      <td v-if="item.trashCanFiles==true">{{item.fileDetail.filesize/1000000000}} GB</td>
+                      <td  v-if="item.trashCanFiles==true">
                         <fwb-dropdown text="Bottom">
                           <template #trigger>
       <span class="dropdown-toggle" id="dropdownMenuButton6" data-toggle="dropdown" aria-expanded="false">
@@ -195,10 +150,10 @@ export default defineComponent({
                           </template>
                           <fwb-list-group class="fwb-list-group">
                             <fwb-list-group-item  class="fwb-list-group-item" @click="moveToTrash(item.filename)">
-                              Move To Trashcan
+                              Rescue File
                             </fwb-list-group-item>
-                            <fwb-list-group-item  class="fwb-list-group-item" @click="getFiles(item.filename)">
-                              Download
+                            <fwb-list-group-item  class="fwb-list-group-item" @click="deleteFile(item.filename)">
+                              Delete
                             </fwb-list-group-item>
                           </fwb-list-group>
                         </fwb-dropdown>

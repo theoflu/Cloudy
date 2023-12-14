@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,34 +40,6 @@ public class Client {
         return length;
     }
 
-    public void check(){
-        String folderPath = "C:\\user\\as3d\\TrashCan"; // Silinecek dosyaların bulunduğu klasör yolu
-
-        File folder = new File(folderPath);
-
-        if (folder.exists() && folder.isDirectory()) {
-            File[] files = folder.listFiles();
-            long currentTime = System.currentTimeMillis();
-
-            if (files != null) {
-                for (File file : files) {
-                    long lastModified = file.lastModified();
-                    long thirtyDaysInMillis =  30L * 24 * 60 * 60 * 1000; // 30 günün milisaniye cinsinden değeri
-
-                    if (currentTime - lastModified > thirtyDaysInMillis) {
-                        boolean isDeleted = file.delete();
-                        if (isDeleted) {
-                            System.out.println("Dosya başarıyla silindi: " + file.getAbsolutePath());
-                        } else {
-                            System.out.println("Dosya silinemedi: " + file.getAbsolutePath());
-                        }
-                    }
-                }
-            }
-        } else {
-            System.out.println("Belirtilen klasör bulunamadı veya bir klasör değil.");
-        }
-    }
     public List<FileDetail> moveFile(String filename, String username) {
         String sourcePath, destinationPath;
 
@@ -96,6 +71,28 @@ public class Client {
         }
     }
 
+    public long deleteFile(String username, String filename){
+        try{
+            File deleteFile= new File("C:\\user\\"+username+"\\TrashCan\\"+filename);
+            File file= new File("C:\\user\\"+username);
+
+           if(deleteFile.delete()){
+               System.out.println(filename+" silindi");
+               long capcity=(a-folderSize(file));
+               return capcity;
+           }
+           else{
+               System.out.println(filename+" sorun olutşru");
+            return 0;
+           }
+        }
+        catch (Exception e){
+            System.out.println(filename+" silindi "+ e.getMessage());
+            return 0;
+        }
+
+    }
+    long a=20000036480L;
     public ErrorMessage sendFile(String filePath, String username,String orginalName){
         try  (Socket socket = new Socket(serverAddress, serverPort)) {
             try {
@@ -109,13 +106,15 @@ public class Client {
 
             File file = new File(filePath);
 
-            long a=20000036480L;
+
             File file2 = new File("C:\\user\\"+username);
+            Path path = Paths.get(file.getAbsolutePath());
             FileDetail fileDetail= FileDetail.
                     builder()
-                    .filepath(file.getPath())
+                    .filepath( "C:\\user\\"+username+"\\"+ orginalName)
                     .filename(orginalName)
-                    .filesize(folderSize(file2))
+                    .filesize(file.length())
+                    .mediType(Files.probeContentType(path))
                     .build();
             if(folderSize(file2)>= a)
             {

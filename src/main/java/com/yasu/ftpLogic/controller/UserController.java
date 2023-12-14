@@ -56,7 +56,7 @@ public class UserController {
            ErrorMessage isGiddimi= client.sendFile(tempFile.getAbsolutePath(), username,file.getOriginalFilename());
 
            if(isGiddimi.getCode().equals("200")){
-               userService.updateCapacity(username,isGiddimi.getFileDetail(), file.getOriginalFilename(),isGiddimi.getCapacity());
+               userService.saveUserFile(username,isGiddimi.getFileDetail(), file.getOriginalFilename(),isGiddimi.getCapacity());
                if (tempFile != null && tempFile.exists()) {
                    tempFile.delete();
                }
@@ -74,13 +74,15 @@ public class UserController {
 
     }
     @GetMapping("/movetotrash/{filename}")
-    public void moveToTrash(@RequestHeader("Authorization")String token ,@PathVariable String filename){
+    public List<UserFileEntitiy> moveToTrash(@RequestHeader("Authorization")String token ,@PathVariable String filename){
         Client client  = new Client("localhost", 3456);
         String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
-        userService.saveTrashcan( username, client.moveFile(filename,username));
-        client.check();
+        userService.saveTrashcan(username, client.moveFile(filename,username),filename);
+        List<UserFileEntitiy> files= userService.userFileList(username);
+        return  files;
 
     }
+
 
     @GetMapping("/fileslist")
     public List<UserFileEntitiy> filesList(@RequestHeader("Authorization")String token){
@@ -159,10 +161,17 @@ public class UserController {
         return ResponseEntity.ok(userService.signIn(userEntity));
 
     }
-    @PostMapping("/delete/{id}")
-    public ResponseEntity<?> signIn(@PathVariable Long id){
+    @GetMapping("/delete/{filename}")
+    public List<UserFileEntitiy> delete(@RequestHeader("Authorization") String token,@PathVariable String filename){
+        Client client  = new Client("localhost", 3456);
+        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
 
-        return ResponseEntity.ok(userService.delete(id));
+        if( userService.delete(username,filename).equals("Silindi"))
+        {
+            userService.updateCapacity(username,filename,client.deleteFile(username,filename));
+        }
+
+        return userService.userFileList(username);
 
     }
 

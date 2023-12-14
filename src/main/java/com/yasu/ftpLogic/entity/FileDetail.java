@@ -14,5 +14,6 @@ public class FileDetail {
     private String filepath;
     private long filesize;
     private long lastmodified;
+    private String mediType;
 
 }

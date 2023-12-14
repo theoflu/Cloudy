@@ -41,15 +41,14 @@
         </div>
         <nav class="iq-sidebar-menu">
           <ul id="iq-sidebar-toggle" class="iq-menu">
-            <li class="active">
+            <li class="">
               <a href="/menu" class="">
                 <i class="las la-home iq-arrow-left"></i><span>Dashboard</span>
               </a>
               <ul id="dashboard" class="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
               </ul>
             </li>
-
-            <li class=" ">
+            <li class="">
               <a href="/favourite" class="">
                 <i class="lar la-star"></i><span>Favourite</span>
               </a>
@@ -427,7 +426,6 @@ export default {
       files: [],
       user: [],
       jwt: "",
-
 
 
     }

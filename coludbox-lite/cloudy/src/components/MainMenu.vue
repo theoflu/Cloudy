@@ -4,6 +4,7 @@ import {getAll} from "@/common/user-service";
 import axios from "axios";
 import HelloWorld from "@/components/HelloWorld.vue";
 import DropFile from "@/components/DropFile.vue";
+import {FwbDropdown, FwbListGroup, FwbListGroupItem} from "flowbite-vue";
 
 
 
@@ -11,7 +12,7 @@ import DropFile from "@/components/DropFile.vue";
 
 export default {
   name: 'MainMenu',
-  components: {DropFile, HelloWorld},
+  components: {FwbDropdown, DropFile, HelloWorld,FwbListGroupItem, FwbListGroup},
   el: '.checkbox',
   props: {
     msg: String
@@ -25,8 +26,8 @@ export default {
         filename:"",
         isCheck:false,
 
-      }
-
+      },
+      isActive: false,
 
     }
   },
@@ -38,8 +39,6 @@ export default {
     };
 
     this.getfilelists(customHeaders);
-
-
 
   }, methods: {
 
@@ -88,7 +87,21 @@ export default {
 
 
     }
-  }
+    ,  async moveToTrash(filename) {
+      try {
+        const response = await axios.get(`user/movetotrash/${filename}`, {
+          headers: {
+            'Authorization': "Bearer " + this.jwt,
+          },
+        });
+        this.files = response.data;
+        console.log(response);
+
+      } catch (error) {
+        console.error(error);
+      }
+
+    }}
 
 
 }
@@ -177,9 +190,31 @@ export default {
         </div>
         <div class="col-lg-3 col-md-6 col-sm-6" v-for='(item, index) in files' :key='index'>
 
-          <div class="card card-block card-stretch card-height">
+
+          <div class="card card-block card-stretch card-height" v-if="item.trashCanFiles==false">
 
             <div class="card-body image-thumb">
+
+              <div class="" style="rotation: revert">
+
+                <fwb-dropdown text="bottom">
+                  <template #trigger>
+      <span class="dropdown-toggle" id="dropdownMenuButton6" data-toggle="dropdown" aria-expanded="false">
+        <i class="ri-more-fill"></i>
+      </span>
+                  </template>
+                  <fwb-list-group class="fwb-list-group">
+                    <fwb-list-group-item  class="fwb-list-group-item" @click="moveToTrash(item.filename)">
+                      Move To Trash
+                    </fwb-list-group-item>
+                    <fwb-list-group-item  class="fwb-list-group-item" @click="getFiles(item.filename)">
+                      Download
+                    </fwb-list-group-item>
+                  </fwb-list-group>
+                </fwb-dropdown>
+
+              </div>
+
               <div  id="app">
                 <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.favourite" @change="checkCheckbox(item)" />
                 <label :for="item.filename" >
@@ -231,6 +266,7 @@ export default {
 
 
               </div>
+
               <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
                 <div class="mb-4 text-center p-3 rounded iq-thumb">
                   <div class="iq-image-overlay"></div>
@@ -241,6 +277,7 @@ export default {
               </a>
             </div>
           </div>
+
         </div>
 
         <div class="col-lg-12">
