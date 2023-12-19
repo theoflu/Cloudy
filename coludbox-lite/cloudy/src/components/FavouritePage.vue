@@ -103,7 +103,18 @@ export default defineComponent({
         console.error(error);
       }
 
-    }}
+    },
+    getImgUrl(pet) {
+      try {
+        const fileExtension = pet.split('.').pop().toLowerCase();
+        var images = require.context('../../../assets/images/layouts/page-1/', false, /\.png$/)
+        return images('./' + fileExtension + ".png")
+      }
+      catch(error){
+        return images('./' + "default" + ".png")
+      }
+    }
+  }
 })
 </script>
 
@@ -135,7 +146,8 @@ export default defineComponent({
                       <td v-if="item.favourite!=false">
                         <div class="d-flex align-items-center">
                           <div class="mr-3">
-                            <a href="#"><img src="../../../assets/images/layouts/page-6/01.png" class="img-fluid avatar-30" alt="image1"></a>
+                            <a href="#"> <img style="width: 35px;height: 35px;" :src="getImgUrl(item.filename)" class="img-fluid" alt="image1">
+                            </a>
                           </div>
                          {{item.filename}}
                         </div>

@@ -9,7 +9,9 @@ export default {
   data() {
     return {
       files: [],
-      fileUrls: [], // Dosya URL'lerini saklamak için bir dizi
+      picFileUrls: [], // Dosya URL'lerini saklamak için bir dizi
+      vidFileUrls: [],
+      FileUrls: [],
     }
   },
   created() {
@@ -23,12 +25,13 @@ export default {
     getfilelists(customHeaders) {
       getAll(customHeaders).then(response => {
         this.files = response.data;
+        console.log(this.files);
         this.files.forEach(file => {
-          this.getFiles(file.filename); // Her dosya için getFiles metodunu çağır
+          this.getFiles(file.filename,file.fileDetail.mediType); // Her dosya için getFiles metodunu çağır
         });
       })
     },
-    async getFiles(filename) {
+    async getFiles(filename,mediType) {
       try {
         const response = await axios.get(`user/download/${filename}`, {
           headers: {
@@ -36,11 +39,31 @@ export default {
           },
           responseType: 'blob'
         });
+
         const url = window.URL.createObjectURL(new Blob([response.data]));
-        this.fileUrls.push(url); // Dosya URL'ini diziye ekle
+        if(mediType=="image/jpeg" || mediType=="image/png")
+        {
+          this.picFileUrls.push({ filename, url }); // Dosya adı ve URL'sini bir nesne olarak ekle
+        }
+        else if(mediType=="video/mp4") {
+          this.vidFileUrls.push({ filename, url }); // Dosya adı ve URL'sini bir nesne olarak ekle
+        }
+        else {
+          this.FileUrls.push({ filename, url }); // Dosya adı ve URL'sini bir nesne olarak ekle
+        }
+
+
+
+
+
       } catch (error) {
         throw new Error('Dosya alınamadı:', error);
       }
+    },
+    getFileUrl(filename, fileType) {
+      let fileUrls = (fileType === 'image') ? this.picFileUrls : (fileType === 'video') ? this.vidFileUrls : (fileType === 'pdf') ? this.vidFileUrls : [];
+      const file = fileUrls.find(file => file.filename === filename);
+      return file ? file.url : null;
     },
   },
   mounted() {
@@ -70,11 +93,28 @@ export default {
     <h2>Resim ve Video Galerisi</h2>
 
     <div class="preview-container mt-4" v-if="files.length">
-      <div v-for="(file, index) in files" :key="file.filename" class="preview-card">
+      <div v-for="(file) in picFileUrls" :key="file.filename" class="preview-card">
         <div>
-          <img height="200" width="200" :src="fileUrls[index]" data-fancybox="gallery" data-fancybox-index="0"/>
+          <label>{{ file.filename }}</label>
+          <img height="200" width="200" :src="getFileUrl(file.filename,'image')" data-fancybox="gallery" data-fancybox-index="0"/>
+        </div>
 
+      </div>
+      <div v-for="(file) in vidFileUrls" :key="file.filename" class="preview-card">
+        <div>
+          <label>{{ file.filename }}</label>
+          <video height="200" width="200" controls controlsList="nodownload">
+            <source :src="getFileUrl(file.filename,'video')" type="video/mp4" >
+          </video>
+        </div>
+      </div>
 
+      <div v-for="(file) in FileUrls" :key="file.filename" class="preview-card">
+        <div>
+          <label>{{ file.filename }}</label>
+          <video height="200" width="200" controls controlsList="nodownload">
+            <source :src="getFileUrl(file.filename,'video')" type="video/mp4" >
+          </video>
         </div>
       </div>
     </div>
