@@ -2,14 +2,14 @@
 
 import {defineComponent} from "vue";
 import HelloWorld from "@/components/HelloWorld.vue";
-import {getAll} from "@/common/user-service";
+import {getTrashFile} from "@/common/user-service";
 import axios from "axios";
-import {FwbDropdown, FwbListGroup, FwbListGroupItem} from "flowbite-vue";
+import {Fancybox} from "@fancyapps/ui";
 
 
 
 export default defineComponent({
-  components: { HelloWorld,FwbListGroupItem, FwbListGroup, FwbDropdown},
+  components: { HelloWorld,},
   name: 'TrashcanComponent',
   el: '.checkbox',
   props: {
@@ -19,7 +19,7 @@ export default defineComponent({
     return {
       files: [],
       jwt: "",
-      durum: [],
+      urls: [],
       datsa: {
         filename:"",
         isCheck:false,
@@ -27,11 +27,26 @@ export default defineComponent({
       }, customHeaders : {
         'Authorization': "Bearer " + this.jwt,
 
-      }
+      },
+      itemsPerPage: 6, // Her sayfada gösterilecek öğe sayısı
+      currentPage: 1, // Şu anki sayfa numarası
 
 
 
     }
+  },computed: {
+    // Mevcut sayfadaki öğeler
+    displayedItems() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+
+
+      return this.files.slice(startIndex, endIndex);
+    },
+    // Toplam sayfa sayısı
+    pages() {
+      return Math.ceil(this.files.length / this.itemsPerPage);
+    },
   },
   created() {
     this.jwt = localStorage.getItem('accessToken');
@@ -45,14 +60,37 @@ export default defineComponent({
 
 
   }, methods: {
-
-    getfilelists(customHeaders) {
-
-      getAll(customHeaders).then(response => {
-        this.files = response.data;
-        console.log( this.files);
-      })
+    changePage(pageNumber) {
+      this.currentPage = pageNumber;
     },
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.pages.length) {
+        this.currentPage++;
+      }
+    },
+
+     getfilelists(customHeaders) {
+      try {
+        getTrashFile(customHeaders).then(response => {
+          this.files = response.data;
+
+          for(var i=0;i<this.files.length;i++){
+            this.getFileUrl(this.files[i].filename)
+          }
+
+        })
+
+      }
+      catch (error) {
+        console.error('Dosya listesi alınamadı:', error);
+      }
+    }
+  ,
     async getFiles(filename) {
       try {
         const response = await axios.get(`user/download/${filename}`, {
@@ -102,18 +140,63 @@ export default defineComponent({
       }
 
     },
-    getImgUrl(pet) {
+     async getFileUrl(filename){
+        const response =  await axios.get(`user/showtrashcan/${filename}`, {
+          headers: {
+            'Authorization': `Bearer ${this.jwt}`,
+          },
+          responseType: 'blob',
+        });
+        console.log(response);
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+       this.urls.push({filename,url});
+      }
+      ,
+      getImgUrl(filename) {
       try {
-        const fileExtension = pet.split('.').pop().toLowerCase();
+        const fileExtension = filename.split('.').pop().toLowerCase();
+
         var images = require.context('../../../assets/images/layouts/page-1/', false, /\.png$/)
+        if(fileExtension==="png" || fileExtension=== "jpg"){
+
+          for (var i=0;i<this.urls.length;i++){
+            if(filename===this.urls[i].filename){
+              return this.urls[i].url;
+            }
+          }
+
+
+  //
+        }
+
         return images('./' + fileExtension + ".png")
+
       }
       catch(error){
         return images('./' + "default" + ".png")
       }
     }
 
-  }
+  },
+  mounted() {
+    Fancybox.bind('[data-fancybox]', {
+      Toolbar: {
+        display: {
+          left: ["infobar"],
+          middle: [
+            "zoomIn",
+            "zoomOut",
+            "toggle1to1",
+            "rotateCCW",
+            "rotateCW",
+            "flipX",
+            "flipY",
+          ],
+          right: ["slideshow", "thumbs", "close"],
+        },
+      },
+    });
+  },
 })
 </script>
 
@@ -135,41 +218,35 @@ export default defineComponent({
                       <th scope="col">???</th>
                       <th scope="col">Last Edit</th>
                       <th scope="col">File Size</th>
-                      <th scope="col"></th>
+                      <th scope="col">Rescue File</th>
+                      <th scope="col">Delete</th>
                     </tr>
                     </thead>
                     <tbody>
 
-                    <tr v-for='(item, index) in files' :key='index'>
+                    <tr v-for='(item, index) in displayedItems' :key='index'>
 
-                      <td v-if="item.trashCanFiles==true">
+                      <td >
                         <div class="d-flex align-items-center">
                           <div class="mr-3">
-                            <a href="#"><img style="width: 35px;height: 35px;" :src="getImgUrl(item.filename)" class="img-fluid" alt="image1">
-                            </a>
+                          <img style="width: 35px;height: 35px;" data-fancybox="gallery" :src="getImgUrl(item.filename)" class="img-fluid" alt="image1">
+
                           </div>
                           {{item.filename}}
                         </div>
                       </td >
-                      <td v-if="item.trashCanFiles==true" > ?????</td>
-                      <td  v-if="item.trashCanFiles==true">jan 21, 2020 me</td>
-                      <td v-if="item.trashCanFiles==true">{{item.fileDetail.filesize/1000000000}} GB</td>
-                      <td  v-if="item.trashCanFiles==true">
-                        <fwb-dropdown text="Bottom">
-                          <template #trigger>
-      <span class="dropdown-toggle" id="dropdownMenuButton6" data-toggle="dropdown" aria-expanded="false">
-        <i class="ri-more-fill"></i>
-      </span>
-                          </template>
-                          <fwb-list-group class="fwb-list-group">
-                            <fwb-list-group-item  class="fwb-list-group-item" @click="moveToTrash(item.filename)">
-                              Rescue File
-                            </fwb-list-group-item>
-                            <fwb-list-group-item  class="fwb-list-group-item" @click="deleteFile(item.filename)">
-                              Delete
-                            </fwb-list-group-item>
-                          </fwb-list-group>
-                        </fwb-dropdown>
+                      <td  > ?????</td>
+                      <td  >jan 21, 2020 me</td>
+                      <td >{{item.fileDetail.filesize/1000000000}} GB</td>
+                      <td style="vertical-align: top;" >
+                        <a class="deletebtn" @click="moveToTrash(item.filename)">
+                          <i class="las la-trash-alt iq-arrow-left" style="font-size: 38px;"></i>
+                        </a>
+                      </td>
+                          <td style="vertical-align: top;">
+                            <a class="deletebtn" @click="deleteFile(item.filename)">
+                              <i class="las la-cloud-download-alt iq-arrow-left" style="font-size: 38px;"></i>
+                            </a>
                       </td>
                     </tr>
 
@@ -178,6 +255,21 @@ export default defineComponent({
                 </div>
               </div>
             </div>
+          </div>
+          <div class="col-lg-12">
+            <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-center">
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                  <a class="page-link" href="#" @click.prevent="previousPage">Previous</a>
+                </li>
+                <li class="page-item" v-for="page in pages" :key="page" :class="{ active: currentPage === page }">
+                  <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                </li>
+                <li class="page-item" :class="{ disabled: currentPage === pages.length }">
+                  <a class="page-link" href="#" @click.prevent="nextPage">Next</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>

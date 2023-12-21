@@ -4,7 +4,6 @@ import UserRegister from "@/components/UserRegister.vue";
 import DownloadFiles from "@/components/DownloadFiles.vue";
 import FavouritePage from "@/components/FavouritePage.vue";
 import MainMenu from "@/components/MainMenu.vue";
-import DropDownComponent from "@/components/DropDownComponent.vue";
 import TrashcanComponent from "@/components/TrashcanComponent.vue";
 import PhotoVideoComp from "@/components/PhotoVideoComp.vue";
 
@@ -33,11 +32,7 @@ const routes = [
         name: 'favourite',
         component: FavouritePage
     }
-    , {
-        path: '/dropworncomp',
-        name: 'dropworncomp',
-        component: DropDownComponent
-    }, {
+    ,{
         path: '/trash',
         name: 'trash',
         component: TrashcanComponent

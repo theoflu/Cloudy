@@ -1,11 +1,13 @@
 <template>
   <RouterView/>
+
+  <!--
   <div id="show">
     <button @click="openModal" class="btn btn-primary">
       Open PDF
     </button>
 
-    <!-- Popup Modal -->
+
     <transition  name="fade">
       <div v-if="modalShow" class="popup-modal">
         <div class="popup-modal-content">
@@ -14,37 +16,28 @@
             <h5 class="modal-title">PDF Viewer</h5>
           </div>
           <div class="modal-body">
-            <!-- PdfViewer bileşeni buraya gelecek -->
+
             <PdfViewer :path="path" :fileName="name" style="width: 100%; height: 420px;" />
           </div>
         </div>
       </div>
     </transition>
-  </div>
+  </div>-->
 </template>
 
 <script>
-import PdfViewer from './components/PdfViewer.vue';
 
 export default {
   name: 'App',
   components: {
-    PdfViewer,
-  },
+      },
   data() {
     return {
-      name: 'demo.pdf',
-      path: 'lib/web/viewer.html',
-      modalShow: false,
+
     };
   },
   methods: {
-    openModal() {
-      this.modalShow = true;
-    },
-    closeModal() {
-      this.modalShow = false;
-    },
+
   },
 };
 </script>

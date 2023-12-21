@@ -153,4 +153,18 @@ public class UserServiceImpl implements UserService {
         return files;
 
     }
+
+    @Override
+    public List<UserFileEntitiy> userFavFileList(String username) {
+        UserEntity user= userRepository.findUserEntityByUsername(username);
+        return filesRepository.findByUserid(user.getId()).stream().filter(p->p.isFavourite()).toList();
+
+    }
+
+    @Override
+    public List<UserFileEntitiy> userTrashFileList(String username) {
+        UserEntity user= userRepository.findUserEntityByUsername(username);
+        return filesRepository.findByUserid(user.getId()).stream().filter(p->p.isTrashCanFiles()).toList();
+
+    }
 }

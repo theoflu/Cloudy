@@ -16,4 +16,6 @@ public interface UserService {
    void updateCapacity(String username, String filename,long capacity);
    void updateFavourite (String username, FavouriteFile favouriteFile);
    List<UserFileEntitiy> userFileList(String username);
+   List<UserFileEntitiy> userFavFileList(String username);
+   List<UserFileEntitiy> userTrashFileList(String username);
 }

@@ -78,7 +78,7 @@ public class UserController {
         Client client  = new Client("localhost", 3456);
         String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
         userService.saveTrashcan(username, client.moveFile(filename,username),filename);
-        List<UserFileEntitiy> files= userService.userFileList(username);
+        List<UserFileEntitiy> files= userService.userTrashFileList(username);
         return  files;
 
     }
@@ -91,11 +91,32 @@ public class UserController {
         String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
         client.listFiles("C:\\user\\"+username);
         return client.listFiles("C:\\user\\"+username);
-
          */
         String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
-       List<UserFileEntitiy> files= userService.userFileList(username);
-        return  files;
+        return  userService.userFileList(username);
+    }
+    @GetMapping("/favfileslist")
+    public List<UserFileEntitiy> favfilesList(@RequestHeader("Authorization")String token){
+        /*
+        Client client  = new Client("localhost", 3456);
+        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
+        client.listFiles("C:\\user\\"+username);
+        return client.listFiles("C:\\user\\"+username);
+         */
+        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
+
+        return   userService.userFavFileList(username);
+    } @GetMapping("/trashfileslist")
+    public List<UserFileEntitiy> trashfilesList(@RequestHeader("Authorization")String token){
+        /*
+        Client client  = new Client("localhost", 3456);
+        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
+        client.listFiles("C:\\user\\"+username);
+        return client.listFiles("C:\\user\\"+username);
+         */
+        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
+
+        return   userService.userTrashFileList(username);
     }
     @GetMapping("/getuser")
     public UserEntity getUser(@RequestHeader("Authorization")String token){
@@ -141,6 +162,31 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/showtrashcan/{filename}")
+    public ResponseEntity<Resource> showtrashcan(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("filename") String filename
+    ) throws IOException {
+
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(6));
+        String filePath = "C:\\user\\" + username + "\\TrashCan\\" + filename;
+
+        Path path = Paths.get(filePath);
+        FileSystemResource resource = new FileSystemResource(path);
+
+        if (resource.exists() && resource.isReadable()) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(resource);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("/favourite")
     public ResponseEntity<?> favourite(@RequestHeader("Authorization") String token, @RequestBody FavouriteFile favouriteFile) {
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(6));

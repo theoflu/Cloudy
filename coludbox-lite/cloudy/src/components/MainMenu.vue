@@ -4,7 +4,6 @@ import {getAll} from "@/common/user-service";
 import axios from "axios";
 import HelloWorld from "@/components/HelloWorld.vue";
 import DropFile from "@/components/DropFile.vue";
-import {FwbDropdown, FwbListGroup, FwbListGroupItem} from "flowbite-vue";
 import {Fancybox} from "@fancyapps/ui";
 import PdfViewer from "@/components/PdfViewer.vue";
 
@@ -14,7 +13,7 @@ import PdfViewer from "@/components/PdfViewer.vue";
 
 export default {
   name: 'MainMenu',
-  components: {PdfViewer, FwbDropdown, DropFile, HelloWorld,FwbListGroupItem, FwbListGroup},
+  components: {PdfViewer, DropFile, HelloWorld},
   el: '.checkbox',
   props: {
     msg: String
@@ -26,7 +25,7 @@ export default {
       vidFileUrls: [],
       FileUrls: [],
       jwt: "",
-      durum: [],
+      wholePacks: [],
       datsa: {
         filename:"",
         isCheck:false,
@@ -36,6 +35,8 @@ export default {
       name: 'demo.pdf',
       path: 'lib/web/viewer.html',
       modalShow: false,
+      itemsPerPage: 8, // Her sayfada gösterilecek öğe sayısı
+      currentPage: 1, // Şu anki sayfa numarası
 
     }
   },
@@ -48,7 +49,25 @@ export default {
 
     this.getfilelists(customHeaders);
 
-  }, methods: {
+  },
+  computed: {
+    // Mevcut sayfadaki öğeler
+    displayedItems() {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+
+
+      return this.picFileUrls.concat(this.vidFileUrls, this.FileUrls).slice(startIndex, endIndex);
+
+    },
+    // Toplam sayfa sayısı
+    pages() {
+      const totalLength = this.picFileUrls.length + this.vidFileUrls.length + this.FileUrls.length;
+      return Math.ceil(totalLength / this.itemsPerPage);
+    },
+  },
+  methods: {
+
 
     async getfilelists(customHeaders) {
       try {
@@ -64,7 +83,50 @@ export default {
         console.error('Dosya listesi alınamadı:', error);
       }
     }
-,
+    ,
+
+    changePage(pageNumber) {
+      this.currentPage = pageNumber;
+    },
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.pages.length) {
+        this.currentPage++;
+      }
+    },
+    async reduceImageQuality(blob, quality) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // Eğer farklı bir origin'den resim çekiliyorsa bu gerekli olabilir
+        img.onload = function () {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+
+          // Resmi canvas'a çiz
+          ctx.drawImage(img, 0, 0);
+
+          // Kaliteyi düşürerek canvas'tan yeni bir Blob oluştur
+          canvas.toBlob(
+              (newBlob) => {
+                resolve(newBlob);
+              },
+              'image/jpeg', // veya 'image/png'
+              quality // Kalite seviyesi (0 ile 1 arasında bir değer)
+          );
+        };
+
+        img.onerror = (error) => reject(error);
+
+        img.src = URL.createObjectURL(blob);
+      });
+    }
+    ,
     async ListFiles(filename, mediType, file) {
       try {
         const response = await axios.get(`user/download/${filename}`, {
@@ -75,21 +137,23 @@ export default {
         });
 
         if (mediType === "image/jpeg" || mediType === "image/png") {
-          const url = URL.createObjectURL(response.data);
-          this.picFileUrls.push({ filename, url, file });
+          const reducedBlob = await this.reduceImageQuality(response.data, 0.2);
+          const reducedUrl = URL.createObjectURL(reducedBlob);
+
+          this.picFileUrls.push({ filename, url: reducedUrl, file ,type:"pic"});
         } else if (mediType === "video/mp4") {
           const url = URL.createObjectURL(response.data);
-          this.vidFileUrls.push({ filename, url, file });
+          this.vidFileUrls.push({ filename, url, file ,type:"vid"});
         } else {
           const url = URL.createObjectURL(response.data);
           const fileExtension = filename.split('.').pop().toLowerCase();
-          this.FileUrls.push({ filename, url, file, fileExtension });
+          this.FileUrls.push({ filename, url, file, fileExtension ,type:"file"});
         }
       } catch (error) {
         console.error('Dosya alınamadı:', error);
       }
     }
-,
+    ,
     getFileUrls(filename, fileType) {
       let fileUrls = (fileType === 'image') ? this.picFileUrls : (fileType === 'video') ? this.vidFileUrls : (fileType === 'file') ? this.FileUrls : [];
       const file = fileUrls.find(file => file.filename === filename);
@@ -182,7 +246,7 @@ export default {
       this.modalShow = false;
     },
   }
-,
+  ,
   mounted() {
     Fancybox.bind('[data-fancybox="gallery"]', {
       Toolbar: {
@@ -287,15 +351,17 @@ export default {
             </div>
           </div>
         </div>
-        <div class="col-lg-3 col-md-6 col-sm-6" v-for='(item, index) in picFileUrls' :key='index'>
-          <div class="card card-block card-stretch card-height" v-if="!item.file.trashCanFile">
-            <div class="card-body image-thumb">
-              <div class="" style="rotation: revert">
+        <div  class="col-lg-3 col-md-6 col-sm-6" v-for='(item, index) in displayedItems' :key='index' >
+
+          <div  v-if="item.type=='pic'" >
+            <div class="card card-block card-stretch card-height" v-if="!item.file.trashCanFile">
+              <div class="" style="rotation:inherit">
+                <!--
                 <fwb-dropdown text="bottom">
                   <template #trigger>
-      <span class="dropdown-toggle" id="dropdownMenuButton6" data-toggle="dropdown" aria-expanded="false">
-        <i class="ri-more-fill"></i>
-      </span>
+        <span class="dropdown-toggle" id="dropdownMenuButton6" data-toggle="dropdown" aria-expanded="false">
+          <i class="ri-more-fill"></i>
+        </span>
                   </template>
                   <fwb-list-group class="fwb-list-group">
                     <fwb-list-group-item  class="fwb-list-group-item" @click="moveToTrash(item.filename)">
@@ -306,234 +372,262 @@ export default {
                     </fwb-list-group-item>
                   </fwb-list-group>
                 </fwb-dropdown>
+  -->
+
               </div>
-              <div  id="app">
-                <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.file.favourite" @change="checkCheckbox(item)" />
-                <label :for="item.filename" >
-                  <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
-                    <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
-                      <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
-                      <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
+              <div class=" card-body image-thumb">
+                <table >
+                  <tr>
+                    <td style="vertical-align: top;">
+                      <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.file.favourite" @change="checkCheckbox(item)" />
+                      <label :for="item.filename" >
+                        <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
+                          <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
+                            <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
+                            <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
 
-                      <g id="grp7" opacity="0" transform="translate(7 6)">
-                        <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
-                        <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
-                      </g>
+                            <g id="grp7" opacity="0" transform="translate(7 6)">
+                              <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
+                              <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
+                            </g>
 
-                      <g id="grp6" opacity="0" transform="translate(0 28)">
-                        <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
-                        <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
-                      </g>
+                            <g id="grp6" opacity="0" transform="translate(0 28)">
+                              <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
+                              <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
+                            </g>
 
-                      <g id="grp3" opacity="0" transform="translate(52 28)">
-                        <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
-                        <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
-                      </g>
+                            <g id="grp3" opacity="0" transform="translate(52 28)">
+                              <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
+                              <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
+                            </g>
 
-                      <g id="grp2" opacity="0" transform="translate(44 6)">
-                        <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
-                        <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
-                      </g>
+                            <g id="grp2" opacity="0" transform="translate(44 6)">
+                              <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
+                              <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
+                            </g>
 
-                      <g id="grp5" opacity="0" transform="translate(14 50)">
-                        <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
-                        <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
-                      </g>
+                            <g id="grp5" opacity="0" transform="translate(14 50)">
+                              <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
+                              <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
+                            </g>
 
-                      <g id="grp4" opacity="0" transform="translate(35 50)">
-                        <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
-                        <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
-                      </g>
+                            <g id="grp4" opacity="0" transform="translate(35 50)">
+                              <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
+                              <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
+                            </g>
 
-                      <g id="grp1" opacity="0" transform="translate(24)">
-                        <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
-                        <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
+                            <g id="grp1" opacity="0" transform="translate(24)">
+                              <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
+                              <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
+                            </g>
+                          </g>
+                        </svg>
+                      </label>
+                    </td>
+                    <td style="vertical-align: top;">
+                      <a class="deletebtn" @click="moveToTrash(item.filename)">
+                        <i class="las la-trash-alt iq-arrow-left" style="font-size: 38px;"></i>
+                      </a>
+                    </td>
+                    <td style="vertical-align: top;">
+                      <a class="deletebtn" @click="getFiles(item.filename)">
+                        <i class="las la-cloud-download-alt iq-arrow-left" style="font-size: 38px;"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
+                  <div class="mb-4 text-center p-3 rounded iq-thumb">
+                    <div class="iq-image-overlay"></div>
+                    <img height="200" width="300" :src="getFileUrls(item.filename,'image')" data-fancybox="gallery" class="img-fluid" alt="image1"/>
+                  </div>
+                  <h6 ref="ad">{{item.filename}}</h6>
+                </a>
               </div>
 
-              <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
-                <div class="mb-4 text-center p-3 rounded iq-thumb">
-                  <div class="iq-image-overlay"></div>
-                  <img height="200" width="300" :src="getFileUrls(item.filename,'image')" data-fancybox="gallery" data-fancybox-index="0" class="img-fluid" alt="image1"/>
-                </div>
-                <h6 ref="ad">{{item.filename}}</h6>
-              </a>
             </div>
           </div>
-
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-6" v-for='(item, index) in vidFileUrls' :key='index'>
-          <div class="card card-block card-stretch card-height" v-if="!item.file.trashCanFile">
-            <div class="card-body image-thumb">
-              <div class="" style="rotation: revert">
-                <fwb-dropdown text="bottom">
-                  <template #trigger>
-      <span class="dropdown-toggle" id="dropdownMenuButton6" data-toggle="dropdown" aria-expanded="false">
-        <i class="ri-more-fill"></i>
-      </span>
-                  </template>
-                  <fwb-list-group class="fwb-list-group">
-                    <fwb-list-group-item  class="fwb-list-group-item" @click="moveToTrash(item.filename)">
-                      Move To Trash
-                    </fwb-list-group-item>
-                    <fwb-list-group-item  class="fwb-list-group-item" @click="getFiles(item.filename)">
-                      Download
-                    </fwb-list-group-item>
-                  </fwb-list-group>
-                </fwb-dropdown>
-              </div>
-              <div  id="app">
-                <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.file.favourite" @change="checkCheckbox(item)" />
-                <label :for="item.filename" >
-                  <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
-                    <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
-                      <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
-                      <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
-
-                      <g id="grp7" opacity="0" transform="translate(7 6)">
-                        <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
-                        <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp6" opacity="0" transform="translate(0 28)">
-                        <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
-                        <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp3" opacity="0" transform="translate(52 28)">
-                        <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
-                        <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp2" opacity="0" transform="translate(44 6)">
-                        <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
-                        <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp5" opacity="0" transform="translate(14 50)">
-                        <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
-                        <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp4" opacity="0" transform="translate(35 50)">
-                        <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
-                        <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp1" opacity="0" transform="translate(24)">
-                        <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
-                        <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </div>
-
-              <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
-                <div class="mb-4 text-center p-3 rounded iq-thumb">
-                  <div class="iq-image-overlay"></div>
-                  <video height="100" width="170" controls controlsList="nodownload">
-                    <source :src="getFileUrls(item.filename,'video')" type="video/mp4" >
-                  </video>
+          <div  v-else-if="item.type=='vid'">
+            <div class="card card-block card-stretch card-height" v-if="!item.file.trashCanFile">
+              <div class="card-body image-thumb">
+                <div class="" style="rotation: revert">
                 </div>
-                <h6 ref="ad">{{item.filename}}</h6>
-              </a>
+                <table >
+                  <tr>
+                    <td style="vertical-align: top;">
+                      <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.file.favourite" @change="checkCheckbox(item)" />
+                      <label :for="item.filename" >
+                        <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
+                          <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
+                            <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
+                            <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
+
+                            <g id="grp7" opacity="0" transform="translate(7 6)">
+                              <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
+                              <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp6" opacity="0" transform="translate(0 28)">
+                              <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
+                              <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp3" opacity="0" transform="translate(52 28)">
+                              <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
+                              <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp2" opacity="0" transform="translate(44 6)">
+                              <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
+                              <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp5" opacity="0" transform="translate(14 50)">
+                              <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
+                              <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp4" opacity="0" transform="translate(35 50)">
+                              <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
+                              <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp1" opacity="0" transform="translate(24)">
+                              <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
+                              <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
+                            </g>
+                          </g>
+                        </svg>
+                      </label>
+                    </td>
+                    <td style="vertical-align: top;">
+                      <a class="deletebtn" @click="moveToTrash(item.filename)">
+                        <i class="las la-trash-alt iq-arrow-left" style="font-size: 38px;"></i>
+                      </a>
+                    </td>
+                    <td style="vertical-align: top;">
+                      <a class="deletebtn" @click="getFiles(item.filename)">
+                        <i class="las la-cloud-download-alt iq-arrow-left" style="font-size: 38px;"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
+                  <div class="mb-4 text-center p-3 rounded iq-thumb">
+                    <div class="iq-image-overlay"></div>
+                    <video height="100" width="170" controls controlsList="nodownload">
+                      <source :src="getFileUrls(item.filename,'video')" type="video/mp4" >
+                    </video>
+                  </div>
+                  <h6 ref="ad">{{item.filename}}</h6>
+                </a>
+              </div>
             </div>
           </div>
-
-        </div>
-        <div class="col-lg-3 col-md-6 col-sm-6" v-for='(item, index) in FileUrls' :key='index'>
-          <div class="card card-block card-stretch card-height" v-if="!item.file.trashCanFile">
-            <div class="card-body image-thumb">
-              <div class="" style="rotation: revert">
-                <fwb-dropdown text="bottom">
-                  <template #trigger>
-      <span class="dropdown-toggle" id="dropdownMenuButton6" data-toggle="dropdown" aria-expanded="false">
-        <i class="ri-more-fill"></i>
-      </span>
-                  </template>
-                  <fwb-list-group class="fwb-list-group">
-                    <fwb-list-group-item  class="fwb-list-group-item" @click="moveToTrash(item.filename)">
-                      Move To Trash
-                    </fwb-list-group-item>
-                    <fwb-list-group-item  class="fwb-list-group-item" @click="getFiles(item.filename)">
-                      Download
-                    </fwb-list-group-item>
-                    <fwb-list-group-item  class="fwb-list-group-item"  @click="openModal(item.filename)">
-                      Show
-
-                    </fwb-list-group-item>
-                  </fwb-list-group>
-                </fwb-dropdown>
-
-
-              </div>
-
-
-              <div  id="app">
-                <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.file.favourite" @change="checkCheckbox(item)" />
-                <label :for="item.filename" >
-                  <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
-                    <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
-                      <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
-                      <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
-
-                      <g id="grp7" opacity="0" transform="translate(7 6)">
-                        <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
-                        <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp6" opacity="0" transform="translate(0 28)">
-                        <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
-                        <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp3" opacity="0" transform="translate(52 28)">
-                        <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
-                        <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp2" opacity="0" transform="translate(44 6)">
-                        <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
-                        <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp5" opacity="0" transform="translate(14 50)">
-                        <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
-                        <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp4" opacity="0" transform="translate(35 50)">
-                        <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
-                        <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
-                      </g>
-
-                      <g id="grp1" opacity="0" transform="translate(24)">
-                        <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
-                        <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
-                      </g>
-                    </g>
-                  </svg>
-                </label>
-              </div>
-
-              <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
-                <div class="mb-4 text-center p-3 rounded iq-thumb">
-                  <div class="iq-image-overlay"></div>
-
-                  <img :src="getImgUrl(item.fileExtension)" class="img-fluid" alt="image1">
-
+          <div v-else >
+            <div class="card card-block card-stretch card-height" v-if="!item.file.trashCanFile">
+              <div class="card-body image-thumb">
+                <div class="" style="rotation: revert">
                 </div>
-                <h6 ref="ad">{{item.filename}}</h6>
-              </a>
-            </div>
-          </div>
+                <table >
+                  <tr>
+                    <td style="vertical-align: top;">
+                      <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.file.favourite" @change="checkCheckbox(item)" />
+                      <label :for="item.filename" >
+                        <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
+                          <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
+                            <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
+                            <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
 
+                            <g id="grp7" opacity="0" transform="translate(7 6)">
+                              <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
+                              <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp6" opacity="0" transform="translate(0 28)">
+                              <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
+                              <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp3" opacity="0" transform="translate(52 28)">
+                              <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
+                              <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp2" opacity="0" transform="translate(44 6)">
+                              <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
+                              <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp5" opacity="0" transform="translate(14 50)">
+                              <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
+                              <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp4" opacity="0" transform="translate(35 50)">
+                              <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
+                              <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp1" opacity="0" transform="translate(24)">
+                              <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
+                              <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
+                            </g>
+                          </g>
+                        </svg>
+                      </label>
+                    </td>
+                    <td style="vertical-align: top;">
+                      <a class="deletebtn" @click="moveToTrash(item.filename)">
+                        <i class="las la-trash-alt iq-arrow-left" style="font-size: 38px;"></i>
+                      </a>
+                    </td>
+                    <td style="vertical-align: top;">
+                      <a class="deletebtn" @click="getFiles(item.filename)">
+                        <i class="las la-cloud-download-alt iq-arrow-left" style="font-size: 38px;"></i>
+                      </a>
+                    </td>
+                    <td v-if="item.fileExtension=='pdf'" style="vertical-align: top;">
+                      <a class="deletebtn" @click="openModal(item.filename)">
+                        <i class="lab la-readme iq-arrow-left" style="font-size: 38px;"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
+                  <div class="mb-4 text-center p-3 rounded iq-thumb">
+                    <div class="iq-image-overlay"></div>
+
+                    <img :src="getImgUrl(item.fileExtension)" class="img-fluid" alt="image1">
+
+                  </div>
+                  <h6 ref="ad">{{item.filename}}</h6>
+                </a>
+              </div>
+            </div>
+
+          </div>
         </div>
 
+
+
+        <div class="col-lg-12">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+              <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                <a class="page-link" href="#" @click.prevent="previousPage">Previous</a>
+              </li>
+              <li class="page-item" v-for="page in pages" :key="page" :class="{ active: currentPage === page }">
+                <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+              </li>
+              <li class="page-item" :class="{ disabled: currentPage === pages.length }">
+                <a class="page-link" href="#" @click.prevent="nextPage">Next</a>
+              </li>
+            </ul>
+          </nav>
+
+        </div>
         <div class="col-lg-12">
           <div class="card card-block card-stretch card-transparent">
             <div class="card-header d-flex justify-content-between pb-0">
@@ -557,10 +651,12 @@ export default {
             </div>
           </div>
         </div>
+
         <div class="col-md-6 col-sm-6 col-lg-3">
           <div class="card card-block card-stretch card-height">
             <div class="card-body">
               <div class="d-flex justify-content-between">
+
                 <a href="./page-alexa.html" class="folder">
                   <div class="icon-small bg-danger rounded mb-4">
                     <i class="ri-file-copy-line"></i>
