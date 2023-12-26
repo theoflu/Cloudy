@@ -202,6 +202,7 @@ public class Client {
                               .filepath(file.getPath())
                               .filename(file.getName())
                               .lastmodified(file.lastModified())
+
                               .build();
                      a.add(fileDetail);
 

@@ -21,9 +21,11 @@ export default {
   data() {
     return {
       files: [],
+      receivedMessage: "",
       picFileUrls: [], // Dosya URL'lerini saklamak için bir dizi
       vidFileUrls: [],
       FileUrls: [],
+      urls:[],
       jwt: "",
       wholePacks: [],
       datsa: {
@@ -67,10 +69,46 @@ export default {
     },
   },
   methods: {
+    handlemessage(message){
+      console.log(message);
+      this.files=message;
+      this.picFileUrls=[];
+      this.vidFileUrls=[];
+      this.FileUrls=[];
+      this.updateFiles(message);
+    },
 
+    async updateFiles(data) {
+      try {
 
+        this.files = data;
+
+        // Paralel olarak istekleri yap
+        await Promise.all(this.files
+            .filter(file => !file.trashCanFiles)
+            .map(file => this.ListFiles(file.filename, file.fileDetail.mediType, file)));
+
+      } catch (error) {
+        console.error('Dosya listesi alınamadı:', error);
+      }
+    }
+    ,
+
+    truncateString(str, maxLength) {
+      // Eğer dize belirtilen maksimum uzunluktan uzunsa, kısalt
+      if (str.length > maxLength) {
+        return str.slice(0, maxLength) + '...'; // Kısaltılmış dizeyi ve üç noktayı ekle
+      } else {
+        return str; // Maksimum uzunluğu geçmiyorsa, dizeyi değiştirmeden geri döndür
+      }
+    },
     async getfilelists(customHeaders) {
       try {
+        this.files=[];
+        this.picFileUrls=[];
+        this.vidFileUrls=[];
+        this.FileUrls=[];
+
         const response = await getAll(customHeaders);
         this.files = response.data;
 
@@ -136,6 +174,9 @@ export default {
           responseType: 'blob',
         });
 
+        const url = URL.createObjectURL(response.data);
+        this.urls.push({ filename, url, file ,type:"vid"});
+
         if (mediType === "image/jpeg" || mediType === "image/png") {
           const reducedBlob = await this.reduceImageQuality(response.data, 0.2);
           const reducedUrl = URL.createObjectURL(reducedBlob);
@@ -181,6 +222,27 @@ export default {
         return response.data; // Dosya içeriğini istemciye döndür
       } catch (error) {
         throw new Error('Dosya alınamadı:', error);
+      }
+    },
+    getImgUrl2(filename) {
+      try {
+        const fileExtension = filename.split('.').pop().toLowerCase();
+
+        var images = require.context('../../../assets/images/layouts/page-1/', false, /\.png$/)
+        if(fileExtension==="png" || fileExtension=== "jpg"){
+
+          for (var i=0;i<this.urls.length;i++){
+            if(filename===this.urls[i].filename){
+              return this.urls[i].url;
+            }
+          }
+          //
+        }
+        return images('./' + fileExtension + ".png")
+
+      }
+      catch(error){
+        return images('./' + "default" + ".png")
       }
     },
     async checkCheckbox(item) {
@@ -321,7 +383,8 @@ export default {
             <div class="card-body property2-content">
               <div class="d-flex flex-wrap align-items-center">
                 <div class="col-lg-8 col-sm-8 p-0">
-                  <DropFile/>
+                  <DropFile @message="handlemessage"/>
+
                 </div>
               </div>
             </div>
@@ -439,7 +502,7 @@ export default {
                 <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
                   <div class="mb-4 text-center p-3 rounded iq-thumb">
                     <div class="iq-image-overlay"></div>
-                    <img height="200" width="300" :src="getFileUrls(item.filename,'image')" data-fancybox="gallery" class="img-fluid" alt="image1"/>
+                    <img height="200" width="300" :src="getImgUrl2(item.filename)" data-fancybox="gallery" class="img-fluid" alt="image1"/>
                   </div>
                   <h6 ref="ad">{{item.filename}}</h6>
                 </a>
@@ -516,7 +579,7 @@ export default {
                   <div class="mb-4 text-center p-3 rounded iq-thumb">
                     <div class="iq-image-overlay"></div>
                     <video height="100" width="170" controls controlsList="nodownload">
-                      <source :src="getFileUrls(item.filename,'video')" type="video/mp4" >
+                      <source :src="getImgUrl2(item.filename)" type="video/mp4" >
                     </video>
                   </div>
                   <h6 ref="ad">{{item.filename}}</h6>
@@ -602,7 +665,7 @@ export default {
                     <img :src="getImgUrl(item.fileExtension)" class="img-fluid" alt="image1">
 
                   </div>
-                  <h6 ref="ad">{{item.filename}}</h6>
+                  <h6 ref="ad">{{truncateString(item.filename,14)}}</h6>
                 </a>
               </div>
             </div>

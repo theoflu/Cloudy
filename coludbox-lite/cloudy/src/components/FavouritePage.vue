@@ -5,11 +5,12 @@ import HelloWorld from "@/components/HelloWorld.vue";
 import { getFavFile} from "@/common/user-service";
 import axios from "axios";
 import {Fancybox} from "@fancyapps/ui";
+import PdfViewer from "@/components/PdfViewer.vue";
 
 
 
 export default defineComponent({
-  components: { HelloWorld},
+  components: {PdfViewer, HelloWorld},
   name: 'FavouritePage',
   el: '.checkbox',
   props: {
@@ -20,10 +21,13 @@ export default defineComponent({
       files: [],
       jwt: "",
       urls: [],
+      modalShow: false,
+      name: 'demo.pdf',
+      path: 'lib/web/viewer.html',
+      showRead:false,
       datsa: {
         filename:"",
         isCheck:false,
-
       }, customHeaders : {
         'Authorization': "Bearer " + this.jwt,
 
@@ -113,24 +117,25 @@ export default defineComponent({
     },
     async checkCheckbox(item) {
       this.datsa.filename=item.filename;
-      await axios.post(`user/favourite`, this.datsa, {
+      const response= await axios.post(`user/favourite`, this.datsa, {
         headers: {
           'Authorization': "Bearer " + this.jwt,
 
         },
       });
+      this.files = response.data;
 
 
     },
     async moveToTrash(filename) {
       try {
-        const response = await axios.get(`user/movetotrash/${filename}`, {
+        const response =  await axios.get(`user/movetotrash/${filename}`, {
           headers: {
             'Authorization': "Bearer " + this.jwt,
           },
         });
-        console.log(response);
-        this.files = response.data;
+
+        this.files=response.data;
 
       } catch (error) {
         console.error(error);
@@ -149,6 +154,19 @@ export default defineComponent({
       this.urls.push({filename,url});
     }
     ,
+
+    openModal(filename) {
+      this.modalShow = true;
+      for (var i=0;i<this.urls.length;i++){
+        console.log(filename);
+        if(this.urls[i].filename== filename){
+          this.name=this.urls[i].url;
+        }
+      }
+    },
+    closeModal() {
+      this.modalShow = false;
+    },
     getImgUrl(filename) {
       try {
         const fileExtension = filename.split('.').pop().toLowerCase();
@@ -161,11 +179,8 @@ export default defineComponent({
               return this.urls[i].url;
             }
           }
-
-
           //
         }
-
         return images('./' + fileExtension + ".png")
 
       }
@@ -173,6 +188,23 @@ export default defineComponent({
         return images('./' + "default" + ".png")
       }
     },
+    getFileTypePdf(filename){
+      try {
+        const fileExtension = filename.split('.').pop().toLowerCase();
+        if(fileExtension==="pdf") {
+          this.showRead=true;
+          return true;
+
+        }
+        else {
+
+          return false;
+        }
+      }
+      catch(error){
+        return false
+      }
+    }
     /*getImgUrl(pet) {
       try {
         const fileExtension = pet.split('.').pop().toLowerCase();
@@ -184,6 +216,7 @@ export default defineComponent({
       }*/
 
   },
+
   mounted() {
     Fancybox.bind('[data-fancybox]', {
       Toolbar: {
@@ -228,6 +261,7 @@ export default defineComponent({
                       <th scope="col">File Size</th>
                       <th scope="col">Move To Trash</th>
                       <th scope="col">Download</th>
+                      <th scope="col" v-if=" showRead" >Read</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -243,7 +277,7 @@ export default defineComponent({
                          {{item.filename}}
                         </div>
                       </td >
-                      <td >  <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.favourite" @change="checkCheckbox(item)" />
+                      <td >  <input class="checkbox" type="checkbox" :id="item.filename" v-if="item.favourite" v-model="item.favourite" @change="checkCheckbox(item)" />
                         <label :for="item.filename" >
                           <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
                             <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
@@ -299,6 +333,11 @@ export default defineComponent({
                           <i class="las la-cloud-download-alt iq-arrow-left" style="font-size: 38px;"></i>
                         </a>
                       </td>
+                      <td style="vertical-align: top;" v-if="getFileTypePdf(item.filename)">
+                        <a class="deletebtn" @click="openModal(item.filename)">
+                          <i class="lab la-readme" style="font-size: 38px;"></i>
+                        </a>
+                      </td>
                     </tr>
 
                     </tbody>
@@ -324,13 +363,68 @@ export default defineComponent({
           </div>
         </div>
       </div>
+      <div id="show">
+
+        <!-- Popup Modal -->
+        <transition  name="fade">
+          <div v-if="modalShow" class="popup-modal">
+            <div class="popup-modal-content">
+              <button class="popup-close-btn" @click="closeModal">×</button>
+              <div class="modal-header">
+                <h5 class="modal-title">PDF Viewer</h5>
+              </div>
+              <div class="modal-body">
+                <!-- PdfViewer bileşeni buraya gelecek -->
+                <PdfViewer :path="path" :fileName="name" style="width: 100%; height: 420px;" />
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
 
     </div>
   </div>
 
 </template>
 
-<style>
 
+<style scoped>
 
+/* Popup modal stilleri */
+.popup-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.popup-modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 90%; /* Genişlik değeri ayarlayabilirsiniz */
+  height: 90%; /* Yükseklik değeri ayarlayabilirsiniz */
+  max-width: 800px;
+  max-height: 800px;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+.popup-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+.modal-header {
+  text-align: center;
+}
 </style>

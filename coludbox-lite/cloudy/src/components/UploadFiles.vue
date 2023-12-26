@@ -36,6 +36,7 @@ methods: {
 
 
           this.message =  response.data.processes;
+
           alert(this.message)
           location.reload();
 

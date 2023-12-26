@@ -240,12 +240,12 @@ export default defineComponent({
                       <td >{{item.fileDetail.filesize/1000000000}} GB</td>
                       <td style="vertical-align: top;" >
                         <a class="deletebtn" @click="moveToTrash(item.filename)">
-                          <i class="las la-trash-alt iq-arrow-left" style="font-size: 38px;"></i>
+                          <i class="las la-trash-restore" style="font-size: 38px;"></i>
                         </a>
                       </td>
                           <td style="vertical-align: top;">
                             <a class="deletebtn" @click="deleteFile(item.filename)">
-                              <i class="las la-cloud-download-alt iq-arrow-left" style="font-size: 38px;"></i>
+                              <i class="las la-trash-alt iq-arrow-left" style="font-size: 38px;"></i>
                             </a>
                       </td>
                     </tr>

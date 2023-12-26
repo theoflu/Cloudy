@@ -167,4 +167,10 @@ public class UserServiceImpl implements UserService {
         return filesRepository.findByUserid(user.getId()).stream().filter(p->p.isTrashCanFiles()).toList();
 
     }
+
+    @Override
+    public Boolean isFavourite(String username, String filename) {
+        UserEntity user= userRepository.findUserEntityByUsername(username);
+        return filesRepository.findFirstByUseridAndFilename(user.getId(),filename).isFavourite();
+    }
 }

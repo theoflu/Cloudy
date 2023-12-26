@@ -1,21 +1,30 @@
 <script>
 import UploadService from "@/assets/services/UploadFilesService";
-
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 export default {
   name:"DropFile",
+  setup() {
+    const notify = (message) => {
+      toast(message, {
+        autoClose: 1000,
+      });
+    }
+    return { notify };
+  },
   data() {
     return {
       isDragging: false,
       files: [],
       selectedFiles: undefined,
-      progressInfos: [],
+      progressInfo: { percentage: 0, fileName: '' }, // Tek bir ilerleme bilgisi
+      message:"",
     };
   },
   methods: {
     onChange() {
       this.selectedFiles = event.target.files;
-      this.progressInfos = [];
       const self = this;
       let incomingFiles = Array.from(this.$refs.file.files);
       const fileExist = self.files.some((r) =>
@@ -27,43 +36,45 @@ export default {
         self.showMessage = true;
         alert("New upload contains files that already exist");
       } else {
-        self.files.push(...incomingFiles);
+        self.files = incomingFiles; // Tüm dosyaları seçilen dosyalarla güncelle
       }
     },
     uploadFiles() {
-      this.message = "";
-
-      for (let i = 0; i < this.selectedFiles.length; i++) {
-        this.upload(i, this.selectedFiles[i]);
-
-      }
+      this.progressInfo = { percentage: 0, fileName: '' }; // İlerleme bilgisini sıfırla
+      this.upload(0); // İlk dosyayı yükle
     },
-    upload(idx, file) {
-      this.progressInfos[idx] = { percentage: 0, fileName: file.name };
-      this.jwt=localStorage.getItem('accessToken');
-      console.log(this.jwt)
-      UploadService.upload(file, (event) => {
-        this.progressInfos[idx].percentage = Math.round(100 * event.loaded / event.total);
+    upload(idx) {
+      if (idx < this.files.length) {
+        const file = this.files[idx];
+        this.progressInfo = { percentage: 0, fileName: file.name };
+        this.jwt = localStorage.getItem('accessToken');
 
-      },this.jwt)
-          .then((response) => {
+        UploadService.upload(file, (event) => {
+          this.progressInfo.percentage = Math.round(100 * event.loaded / event.total);
+        }, this.jwt)
+            .then((response) => {
+              this.message = response.data;
+              this.notify(this.message.processes);
 
-
-            this.message =  response.data.processes;
-            alert(this.message)
-
-            location.reload();
-
-          })
-          .then((files) => {
-
-            this.fileInfos = files.data;
-          })
-          .catch(() => {
-            this.progressInfos[idx].percentage = 0;
-            this.message = "Could not upload the file:" + file.name;
-
-          });
+            })
+            .then(() => {
+              if (idx + 1 < this.files.length) {
+                // Bir sonraki dosyayı yükle
+                this.upload(idx + 1);
+              } else
+               {
+                // Tüm dosyalar yüklendiğinde, işlemleri sıfırla
+                this.files = [];
+                this.selectedFiles = null;
+                this.progressInfo = { percentage: 0, fileName: '' }; // İlerleme bilgisini sıfırla
+                 this.$emit("message", this.message.files);
+              }
+            })
+            .catch(() => {
+              this.progressInfo.percentage = 0;
+              this.message = "Could not upload the file:" + file.name;
+            });
+      }
     },
     dragover(e) {
       e.preventDefault();
@@ -142,29 +153,26 @@ export default {
     </div>
   </div>
 
+
   <button class="btn btn-success"
           :disabled="!selectedFiles"
           @click="uploadFiles"
   >
     Upload
   </button>
-  <div v-if="progressInfos">
-    <div class="mb-2"
-         v-for="(progressInfo, index) in progressInfos"
-         :key="index"
-    >
-      <span>{{progressInfo.fileName}}</span>
-      <div class="progress">
-        <div class="progress-bar progress-bar-info"
-             role="progressbar"
-             :aria-valuenow="progressInfo.percentage"
-             aria-valuemin="0"
-             aria-valuemax="100"
-             :style="{ width: progressInfo.percentage + '%' }"
-        >
-          {{progressInfo.percentage}}%
-        </div>
+  <div v-if="progressInfo.fileName">
+    <span>{{ progressInfo.fileName }}</span>
+    <div class="progress">
+      <div class="progress-bar progress-bar-info"
+           role="progressbar"
+           :aria-valuenow="progressInfo.percentage"
+           aria-valuemin="0"
+           aria-valuemax="100"
+           :style="{ width: progressInfo.percentage + '%' }"
+      >
+        {{ progressInfo.percentage }}%
       </div>
+
     </div>
   </div>
 

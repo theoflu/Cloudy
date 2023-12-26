@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600,allowedHeaders = "*")
 @RestController
@@ -60,11 +61,12 @@ public class UserController {
                if (tempFile != null && tempFile.exists()) {
                    tempFile.delete();
                }
-               return new statusProcesses("GÖNDERİLDİ");
+
+               return new statusProcesses( userService.userFileList(username),"GÖNDERİLDİ");
 
            }
            else
-               return new statusProcesses("Gönderilemedi");
+               return new statusProcesses(userService.userFileList(username),"Gönderilemedi");
 
 
         }
@@ -74,12 +76,19 @@ public class UserController {
 
     }
     @GetMapping("/movetotrash/{filename}")
-    public List<UserFileEntitiy> moveToTrash(@RequestHeader("Authorization")String token ,@PathVariable String filename){
-        Client client  = new Client("localhost", 3456);
-        String username= jwtUtils.getUserNameFromJwtToken(token.substring(6));
-        userService.saveTrashcan(username, client.moveFile(filename,username),filename);
-        List<UserFileEntitiy> files= userService.userTrashFileList(username);
-        return  files;
+    public List<UserFileEntitiy> moveToTrash(@RequestHeader("Authorization") String token, @PathVariable String filename) {
+        Client client = new Client("localhost", 3456);
+        String username = jwtUtils.getUserNameFromJwtToken(token.substring(6));
+        Boolean a =userService.isFavourite(username,filename);
+        userService.saveTrashcan(username, client.moveFile(filename, username), filename);
+
+        if(!a){
+            return userService.userTrashFileList(username);
+        }
+        else{
+            return userService.userFavFileList(username);
+        }
+
 
     }
 
@@ -188,11 +197,11 @@ public class UserController {
     }
 
     @PostMapping("/favourite")
-    public ResponseEntity<?> favourite(@RequestHeader("Authorization") String token, @RequestBody FavouriteFile favouriteFile) {
+    public List<UserFileEntitiy> favourite(@RequestHeader("Authorization") String token, @RequestBody FavouriteFile favouriteFile) {
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(6));
 
         userService.updateFavourite(username,favouriteFile);
-        return ResponseEntity.ok("İŞLEM DAMAM");
+        return userService.userFavFileList(username);
     }
 
     @PostMapping("/signUp")
@@ -217,7 +226,7 @@ public class UserController {
             userService.updateCapacity(username,filename,client.deleteFile(username,filename));
         }
 
-        return userService.userFileList(username);
+        return userService.userTrashFileList(username);
 
     }
 
