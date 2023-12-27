@@ -25,6 +25,7 @@ export default {
       picFileUrls: [], // Dosya URL'lerini saklamak için bir dizi
       vidFileUrls: [],
       FileUrls: [],
+      searchTerm: '',
       urls:[],
       jwt: "",
       wholePacks: [],
@@ -59,20 +60,33 @@ export default {
       const endIndex = startIndex + this.itemsPerPage;
 
 
-      return this.picFileUrls.concat(this.vidFileUrls, this.FileUrls).slice(startIndex, endIndex);
+      //return this.picFileUrls.concat(this.vidFileUrls, this.FileUrls).slice(startIndex, endIndex);
+      return this.urls.filter(item =>
+          item.filename.toLowerCase().includes(this.searchTerm.toLowerCase())
+      ).slice(startIndex, endIndex);
 
+    },
+    filteredItems() {
+      // searchTerm'e göre filtreleme işlemi
+      return this.urls.filter(item =>
+          item.filename.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
     },
     // Toplam sayfa sayısı
     pages() {
-      const totalLength = this.picFileUrls.length + this.vidFileUrls.length + this.FileUrls.length;
+      const totalLength = this.urls.length;
       return Math.ceil(totalLength / this.itemsPerPage);
     },
   },
   methods: {
+    handleSearchTermChange(searchTerm) {
+      this.searchTerm = searchTerm; // Arama terimini ana bileşende güncelliyoruz
+    },
     handlemessage(message){
       console.log(message);
       this.files=message;
       this.picFileUrls=[];
+      this.urls=[];
       this.vidFileUrls=[];
       this.FileUrls=[];
       this.updateFiles(message);
@@ -175,20 +189,27 @@ export default {
         });
 
         const url = URL.createObjectURL(response.data);
-        this.urls.push({ filename, url, file ,type:"vid"});
 
         if (mediType === "image/jpeg" || mediType === "image/png") {
           const reducedBlob = await this.reduceImageQuality(response.data, 0.2);
           const reducedUrl = URL.createObjectURL(reducedBlob);
 
-          this.picFileUrls.push({ filename, url: reducedUrl, file ,type:"pic"});
-        } else if (mediType === "video/mp4") {
+          this.urls.push({ filename, url:reducedUrl, file ,type:"pic"});
+        } else if(mediType === "image/gif") {
+          this.urls.push({ filename, url, file ,type:"pic"});
+
+        }
+          else if (mediType === "video/mp4" ) {
+          this.urls.push({ filename, url, file ,type:"vid"});
+        }
+          else if ( mediType==="audio/mpeg" ) {
           const url = URL.createObjectURL(response.data);
-          this.vidFileUrls.push({ filename, url, file ,type:"vid"});
-        } else {
-          const url = URL.createObjectURL(response.data);
+
+          this.urls.push({ filename, url, file ,type:"mzk"});
+        }
+          else {
           const fileExtension = filename.split('.').pop().toLowerCase();
-          this.FileUrls.push({ filename, url, file, fileExtension ,type:"file"});
+          this.urls.push({ filename, url, file, fileExtension ,type:"file"});
         }
       } catch (error) {
         console.error('Dosya alınamadı:', error);
@@ -202,6 +223,8 @@ export default {
     },
     async getFiles(filename) {
       try {
+        //TODO main menu dosya alma şeklini bir değiştirelim bakalım hızlanacak mı sonra arama yerini yap
+
         const response = await axios.get(`user/download/${filename}`, {
           headers: {
             'Authorization': "Bearer " + this.jwt,
@@ -229,7 +252,7 @@ export default {
         const fileExtension = filename.split('.').pop().toLowerCase();
 
         var images = require.context('../../../assets/images/layouts/page-1/', false, /\.png$/)
-        if(fileExtension==="png" || fileExtension=== "jpg"){
+        if(fileExtension==="png" || fileExtension=== "jpg"|| fileExtension==="mp4" || fileExtension === "jfif"|| fileExtension === "gif" || fileExtension==="mp3" || fileExtension==="jpeg"){
 
           for (var i=0;i<this.urls.length;i++){
             if(filename===this.urls[i].filename){
@@ -297,10 +320,10 @@ export default {
     },
     openModal(filename) {
       this.modalShow = true;
-      for (var i=0;i<this.FileUrls.length;i++){
+      for (var i=0;i<this.urls.length;i++){
         console.log(filename);
-        if(this.FileUrls[i].filename== filename){
-          this.name=this.FileUrls[i].url;
+        if(this.urls[i].filename== filename){
+          this.name=this.urls[i].url;
         }
       }
     },
@@ -334,7 +357,7 @@ export default {
 </script>
 
 <template>
-  <HelloWorld/>
+  <HelloWorld @search-changed="handleSearchTermChange"/>
   <div class="content-page">
     <div class="container-fluid">
       <div class="row">
@@ -587,6 +610,84 @@ export default {
               </div>
             </div>
           </div>
+          <div  v-else-if="item.type=='mzk'">
+            <div class="card card-block card-stretch card-height" v-if="!item.file.trashCanFile">
+              <div class="card-body image-thumb">
+                <div class="" style="rotation: revert">
+                </div>
+                <table >
+                  <tr>
+                    <td style="vertical-align: top;">
+                      <input class="checkbox" type="checkbox" :id="item.filename" v-model="item.file.favourite" @change="checkCheckbox(item)" />
+                      <label :for="item.filename" >
+                        <svg id="heart-svg" viewBox="467 392 58 57" xmlns="http://www.w3.org/2000/svg">
+                          <g id="Group" fill="none" fill-rule="evenodd" transform="translate(467 392)">
+                            <path d="M29.144 20.773c-.063-.13-4.227-8.67-11.44-2.59C7.63 28.795 28.94 43.256 29.143 43.394c.204-.138 21.513-14.6 11.44-25.213-7.214-6.08-11.377 2.46-11.44 2.59z" id="heart" fill="#AAB8C2"/>
+                            <circle id="main-circ" fill="#E2264D" opacity="0" cx="29.5" cy="29.5" r="1.5"/>
+
+                            <g id="grp7" opacity="0" transform="translate(7 6)">
+                              <circle id="oval1" fill="#9CD8C3" cx="2" cy="6" r="2"/>
+                              <circle id="oval2" fill="#8CE8C3" cx="5" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp6" opacity="0" transform="translate(0 28)">
+                              <circle id="oval1" fill="#CC8EF5" cx="2" cy="7" r="2"/>
+                              <circle id="oval2" fill="#91D2FA" cx="3" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp3" opacity="0" transform="translate(52 28)">
+                              <circle id="oval2" fill="#9CD8C3" cx="2" cy="7" r="2"/>
+                              <circle id="oval1" fill="#8CE8C3" cx="4" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp2" opacity="0" transform="translate(44 6)">
+                              <circle id="oval2" fill="#CC8EF5" cx="5" cy="6" r="2"/>
+                              <circle id="oval1" fill="#CC8EF5" cx="2" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp5" opacity="0" transform="translate(14 50)">
+                              <circle id="oval1" fill="#91D2FA" cx="6" cy="5" r="2"/>
+                              <circle id="oval2" fill="#91D2FA" cx="2" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp4" opacity="0" transform="translate(35 50)">
+                              <circle id="oval1" fill="#F48EA7" cx="6" cy="5" r="2"/>
+                              <circle id="oval2" fill="#F48EA7" cx="2" cy="2" r="2"/>
+                            </g>
+
+                            <g id="grp1" opacity="0" transform="translate(24)">
+                              <circle id="oval1" fill="#9FC7FA" cx="2.5" cy="3" r="2"/>
+                              <circle id="oval2" fill="#9FC7FA" cx="7.5" cy="2" r="2"/>
+                            </g>
+                          </g>
+                        </svg>
+                      </label>
+                    </td>
+                    <td style="vertical-align: top;">
+                      <a class="deletebtn" @click="moveToTrash(item.filename)">
+                        <i class="las la-trash-alt iq-arrow-left" style="font-size: 38px;"></i>
+                      </a>
+                    </td>
+                    <td style="vertical-align: top;">
+                      <a class="deletebtn" @click="getFiles(item.filename)">
+                        <i class="las la-cloud-download-alt iq-arrow-left" style="font-size: 38px;"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <a href="#" :data-title=item.filename data-load-file="file" data-load-target="#resolte-contaniner" :data-url="item.filepath" data-toggle="modal" data-target="#exampleModal">
+                  <div class="mb-4 text-center p-3 rounded iq-thumb">
+                    <div class="iq-image-overlay"></div>
+                    <audio style="width: 200px;height:100px " controls controlsList="nodownload">
+                      <source :src="getImgUrl2(item.filename)" type="audio/mpeg">
+                    </audio>
+                  </div>
+                  <h6 ref="ad">{{item.filename}}</h6>
+                </a>
+              </div>
+            </div>
+          </div>
+
           <div v-else >
             <div class="card card-block card-stretch card-height" v-if="!item.file.trashCanFile">
               <div class="card-body image-thumb">

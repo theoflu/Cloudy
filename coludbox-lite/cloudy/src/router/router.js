@@ -6,6 +6,7 @@ import FavouritePage from "@/components/FavouritePage.vue";
 import MainMenu from "@/components/MainMenu.vue";
 import TrashcanComponent from "@/components/TrashcanComponent.vue";
 import PhotoVideoComp from "@/components/PhotoVideoComp.vue";
+import SearchItem from "@/components/SearchItem.vue";
 
 const routes = [
     {
@@ -41,6 +42,10 @@ const routes = [
         path: '/vid',
         name: 'vid',
         component: PhotoVideoComp
+    },{
+        path: '/search',
+        name: 'search',
+        component: SearchItem
     }
 
 

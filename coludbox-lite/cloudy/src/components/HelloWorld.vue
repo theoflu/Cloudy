@@ -93,8 +93,13 @@
             <div class="input-prepend input-append">
               <div class="btn-group">
                 <label class="dropdown-toggle searchbox" data-toggle="dropdown">
-                  <input class="dropdown-toggle search-query text search-input" type="text"  placeholder="Type here to search..."><span class="search-replace"></span>
-                  <a class="search-link" href="#"><i class="ri-search-line"></i></a>
+                  <input
+                      class="dropdown-toggle search-query text search-input"
+                      type="text"
+                      placeholder="Type here to search..."
+                      v-model="searchTerm"
+                      @input="emitSearchTerm"
+                  />                  <a class="search-link" href="#"><i class="ri-search-line"></i></a>
                   <span class="caret"><!--icon--></span>
                 </label>
                 <ul class="dropdown-menu">
@@ -428,6 +433,7 @@ export default {
       files: [],
       user: [],
       jwt: "",
+      searchTerm: '', // Arama terimi için veri
 
 
     }
@@ -444,7 +450,9 @@ export default {
 
 
   }, methods: {
-
+    emitSearchTerm() {
+      this.$emit('search-changed', this.searchTerm); // Arama terimini emit ederek ana bileşene iletiyoruz
+    },
     getuser(customHeaders) {
       getUser(customHeaders).then(response => {
         this.user = response.data;

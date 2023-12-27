@@ -152,7 +152,6 @@ public class UserController {
             @RequestHeader("Authorization") String token,
             @PathVariable("filename") String filename
     ) throws IOException {
-
         String username = jwtUtils.getUserNameFromJwtToken(token.substring(6));
         String filePath = "C:\\user\\" + username + "\\" + filename;
 

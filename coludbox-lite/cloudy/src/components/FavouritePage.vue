@@ -20,6 +20,7 @@ export default defineComponent({
     return {
       files: [],
       jwt: "",
+      searchTerm: '',
       urls: [],
       modalShow: false,
       name: 'demo.pdf',
@@ -46,7 +47,11 @@ export default defineComponent({
       const endIndex = startIndex + this.itemsPerPage;
 
 
-      return this.files.slice(startIndex, endIndex);
+      //return this.files.slice(startIndex, endIndex);
+      return this.files.filter(item =>
+          item.filename.toLowerCase().includes(this.searchTerm.toLowerCase())
+      ).slice(startIndex, endIndex);
+
     },
     // Toplam sayfa sayısı
     pages() {
@@ -65,6 +70,9 @@ export default defineComponent({
 
 
   }, methods: {
+    handleSearchTermChange(searchTerm) {
+      this.searchTerm = searchTerm; // Arama terimini ana bileşende güncelliyoruz
+    },
     changePage(pageNumber) {
       this.currentPage = pageNumber;
     },
@@ -172,7 +180,7 @@ export default defineComponent({
         const fileExtension = filename.split('.').pop().toLowerCase();
 
         var images = require.context('../../../assets/images/layouts/page-1/', false, /\.png$/)
-        if(fileExtension==="png" || fileExtension=== "jpg"){
+        if(fileExtension==="png" || fileExtension=== "jpg" || fileExtension === "jfif"|| fileExtension === "gif"){
 
           for (var i=0;i<this.urls.length;i++){
             if(filename===this.urls[i].filename){
@@ -242,7 +250,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <HelloWorld/>
+  <HelloWorld @search-changed="handleSearchTermChange"/>
 
   <div class="content-page">
     <div class="container-fluid">
